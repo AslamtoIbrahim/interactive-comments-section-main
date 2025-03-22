@@ -23,10 +23,10 @@ const ScoreButton = ({score = 2, setOnclickScore}:prop) => {
     }
   }
   return (
-    <div className='bg-very-light-gray text-moderate-blue/55  w-fit font-rubik font-medium  py-1 px-3 rounded-lg flex items-center gap-4  '>
-      <button onClick={handleIncrement} className='cursor-pointer'>+</button>
+    <div className='bg-very-light-gray text-moderate-blue/55  w-fit font-rubik font-medium  md:text-lg py-1 px-3 md:px-4 rounded-lg flex md:flex-col items-center   gap-4 md:gap-2  '>
+      <button onClick={handleIncrement} className='cursor-pointer hover:text-moderate-blue'>+</button>
       <p className='text-moderate-blue'>{scores}</p>
-      <button onClick={handleDecrement} className='cursor-pointer'>-</button>
+      <button onClick={handleDecrement} className='cursor-pointer hover:text-moderate-blue'>-</button>
     </div>
   )
 }

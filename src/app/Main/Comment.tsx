@@ -1,9 +1,12 @@
-import Image from "next/image";
-import React from "react";
-import mb from "../../../public/source/images/avatars/image-juliusomo.png";
-import dt from "../../../public/source/images/avatars/image-juliusomo.webp";
+"use client";
+import React, { useState } from "react";
 import ScoreButton from "./ScoreButton";
-import ReplyButton from "./ReplyButton";
+import CurrentUser from "./CurrentUser";
+import EditButton from "./EditButton";
+import DeleteButton from "./DeleteButton";
+import Picture from "./Picture";
+import Input from "./Input";
+import Button from "./Button";
 
 interface Iimg {
   png: string;
@@ -27,42 +30,44 @@ interface Icomment {
 
 type prop = {
   comment?: Icomment;
-}
-const Comment = ({comment}: prop) => {
+};
+const Comment = ({ comment }: prop) => {
+  const [editable, seteditable] = useState(false);
+  const handleEditClik = () => {
+    seteditable(!editable);
+  };
   return (
-    <div className="bg-white p-4 rounded-md font-rubik flex flex-col gap-3">
-      <section className="flex flex-col gap-3">
+    <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
+      <section className="w-full flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <picture>
-            <source
-              width={64}
-              height={64}
-              srcSet={dt.src}
-              type="image/webp"
-              media="(min-width: 768px)"
-            />
-            <Image
-              src={mb}
-              alt="Profile Picture"
-              width={30}
-              height={30}
-              priority
-              quality={100}
-            />
-          </picture>
-          <p className="font-semibold text-dark-blue">username</p>
-          <p className="text-grayish-blue">Create AT</p>
+          <Picture />
+          <p className="font-semibold md:text-lg text-dark-blue">username</p>
+          <CurrentUser />
+          <p className="text-grayish-blue md:text-lg">Create AT</p>
         </div>
-        <p className="text-grayish-blue">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non neque
-          elit. Sed ut imperdiet lectus. Sed euismod odio vel velit aliquet, vel
-          cursus velit faucibus. Proin nec velit vel velit aliquet, vel cursus
-          velit faucibus.
-        </p>
+        {!editable ? (
+          <p className="text-grayish-blue md:text-lg">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
+            neque elit. Sed ut imperdiet lectus. Sed euismod odio vel velit
+            aliquet, vel cursus velit faucibus. Proin nec velit vel velit
+            aliquet, vel cursus velit faucibus.
+          </p>
+        ) : (
+          <section className="flex flex-col gap-2">
+            <Input text="hello" />
+            <Button className="self-end" text="Update" />
+          </section>
+        )}
       </section>
       <section className="flex items-center justify-between">
         <ScoreButton />
-        <ReplyButton />
+        <section className="md:absolute md:top-6 md:right-10">
+          {/* <ReplyButton /> */}
+          <div className="flex items-center gap-3">
+            <DeleteButton />
+            <EditButton onlcik={handleEditClik} />
+          </div>
+        </section>
       </section>
     </div>
   );
