@@ -7,6 +7,7 @@ import DeleteButton from "./DeleteButton";
 import Picture from "./Picture";
 import Input from "./Input";
 import Button from "./Button";
+import Dialog from "../Dialog/Dialog";
 
 interface Iimg {
   png: string;
@@ -33,8 +34,16 @@ type prop = {
 };
 const Comment = ({ comment }: prop) => {
   const [editable, seteditable] = useState(false);
+  const [dialog, setDialog] = useState(false);
   const handleEditClik = () => {
     seteditable(!editable);
+  };
+  const handleDialog = () => {
+    setDialog(!dialog);
+  };
+  const handleDelete = () => {
+    // delete comment logic here
+    setDialog(false);
   };
   return (
     <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
@@ -55,7 +64,7 @@ const Comment = ({ comment }: prop) => {
         ) : (
           <section className="flex flex-col gap-2">
             <Input text="hello" />
-            <Button className="self-end" text="Update" />
+            <Button className="self-end px-3" text="Update" />
           </section>
         )}
       </section>
@@ -64,11 +73,12 @@ const Comment = ({ comment }: prop) => {
         <section className="md:absolute md:top-6 md:right-10">
           {/* <ReplyButton /> */}
           <div className="flex items-center gap-3">
-            <DeleteButton />
+            <DeleteButton onlcik={handleDialog} />
             <EditButton onlcik={handleEditClik} />
           </div>
         </section>
       </section>
+      {dialog && <Dialog cancelClick={handleDialog} deleteClick={handleDelete}/>}
     </div>
   );
 };
