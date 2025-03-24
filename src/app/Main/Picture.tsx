@@ -1,7 +1,6 @@
 import Image from "next/image";
 import React from "react";
 import mbx from "../../../public/source/images/avatars/image-juliusomo.png";
-import dtx from "../../../public/source/images/avatars/image-juliusomo.webp";
 
 type prop = {
     mb?: string;
@@ -12,13 +11,13 @@ const Picture = ({mb, dt}:prop) => {
     <picture>
   
     <source
-      srcSet={dtx.src}
+      srcSet={dt}
       type="image/webp"
       media="(min-width: 768px)"
     />
     <Image
       className="h-auto md:w-10 lg:w-16"
-      src={mbx}
+      src={mb || mbx}
       alt="Profile Picture"
       width={30}
       height={30}
