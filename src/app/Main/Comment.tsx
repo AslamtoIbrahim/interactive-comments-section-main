@@ -8,33 +8,42 @@ import Picture from "./Picture";
 import Input from "./Input";
 import Button from "./Button";
 import Dialog from "../Dialog/Dialog";
-
-interface Iimg {
-  png: string;
-  webp: string;
-}
+import ReplyButton from "./ReplyButton";
 
 interface Ireply {
   content: string;
   createdAt: string;
   score: number;
   replyingTo: string;
-  user: Iimg;
+  user: {
+    png: string;
+    webp: string;
+  };
 }
 interface Icomment {
   content: string;
   createdAt: string;
   score: number;
-  user: Iimg;
+  user: {
+    image: {
+      png: string;
+      webp: string;
+    };
+    username: string;
+  };
   replies: Ireply[];
 }
 
 type prop = {
   comment?: Icomment;
+  currentUserName?: string;
 };
-const Comment = ({ comment }: prop) => {
+const Comment = ({ comment, currentUserName }: prop) => {
   const [editable, seteditable] = useState(false);
   const [dialog, setDialog] = useState(false);
+
+  console.log("😍", comment?.user.image.png);
+
   const handleEditClik = () => {
     seteditable(!editable);
   };
@@ -43,42 +52,47 @@ const Comment = ({ comment }: prop) => {
   };
   const handleDelete = () => {
     // delete comment logic here
+    localStorage.clear();
     setDialog(false);
   };
   return (
     <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
-      <section className="w-full flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <Picture />
-          <p className="font-semibold md:text-lg text-dark-blue">username</p>
-          <CurrentUser />
-          <p className="text-grayish-blue md:text-lg">Create AT</p>
+      <section className="w-full flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Picture mb={comment?.user.image.png} dt={comment?.user.image.webp} />
+          <p className="font-semibold text-sm md:text-lg text-dark-blue">
+            {comment?.user.username}{" "}
+          </p>
+          {currentUserName == comment?.user.username && <CurrentUser />}
+          <p className="text-grayish-blue text-sm md:text-lg">
+            {comment?.createdAt}
+          </p>
         </div>
         {!editable ? (
-          <p className="text-grayish-blue md:text-lg">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
-            neque elit. Sed ut imperdiet lectus. Sed euismod odio vel velit
-            aliquet, vel cursus velit faucibus. Proin nec velit vel velit
-            aliquet, vel cursus velit faucibus.
-          </p>
+          <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
         ) : (
           <section className="flex flex-col gap-2">
-            <Input text="hello" />
+            <Input text={`@${comment?.user.username} ${comment?.content}`} />
             <Button className="self-end px-3" text="Update" />
           </section>
         )}
       </section>
       <section className="flex items-center justify-between">
-        <ScoreButton />
+        <ScoreButton score={comment?.score} />
         <section className="md:absolute md:top-6 md:right-10">
-          {/* <ReplyButton /> */}
-          <div className="flex items-center gap-3">
-            <DeleteButton onlcik={handleDialog} />
-            <EditButton onlcik={handleEditClik} />
-          </div>
+          {currentUserName == comment?.user.username ? (
+            <div className="flex items-center gap-3">
+              <DeleteButton onlcik={handleDialog} />
+              <EditButton onlcik={handleEditClik} />
+            </div>
+          ) : (
+            <ReplyButton />
+          )}
         </section>
       </section>
-      {dialog && <Dialog cancelClick={handleDialog} deleteClick={handleDelete}/>}
+      {dialog && (
+        <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+      )}
     </div>
   );
 };

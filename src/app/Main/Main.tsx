@@ -2,12 +2,14 @@
 import React, { useEffect, useState } from "react";
 import Comment from "./Comment";
 import Response from "./Response";
+import CommentReply from "./CommentReply";
 
 const Main = () => {
   const [data, setdata] = useState<{ currentUser?: any; comments: any[] }>({
     currentUser: undefined, 
     comments: [],
   });
+
   // load initial data from data.json or localStorage
   useEffect(() => {
     console.log('hello json 😋');
@@ -28,9 +30,12 @@ const Main = () => {
   }, []);
   return (
     <div className="bg-very-light-gray h-screen py-8 px-4 flex flex-col gap-3">
-      <Comment />
-      {/* <Response currentUser={data.currentUser} /> */}
-      <p>{data.currentUser?.username} </p>
+      {
+        data.comments.map((comment, index) => (
+          <CommentReply key={index} comment={comment} />
+        ))
+      }
+      <Response currentUser={data.currentUser} />
     </div>
   );
 };
