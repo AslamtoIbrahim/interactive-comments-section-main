@@ -6,14 +6,14 @@ import CommentReply from "./CommentReply";
 
 const Main = () => {
   const [data, setdata] = useState<{ currentUser?: any; comments: any[] }>({
-    currentUser: undefined, 
+    currentUser: undefined,
     comments: [],
   });
 
   // load initial data from data.json or localStorage
   useEffect(() => {
-    console.log('hello json 😋');
-    
+    console.log("hello json 😋");
+
     const saveData = localStorage.getItem("jsonData");
     if (saveData) {
       setdata(JSON.parse(saveData));
@@ -29,12 +29,15 @@ const Main = () => {
     }
   }, []);
   return (
-    <div className="bg-very-light-gray h-screen py-8 px-4 flex flex-col gap-3">
-      {
-        data.comments.map((comment, index) => (
-          <CommentReply key={index} comment={comment} />
-        ))
-      }
+    <div className="bg-very-light-gray  py-6 px-4 flex flex-col gap-2">
+      {data.comments.map((comment, index) => (
+        <CommentReply
+          key={index}
+          comment={comment}
+          username={data.currentUser.username}
+          index={index}
+        />
+      ))}
       <Response currentUser={data.currentUser} />
     </div>
   );

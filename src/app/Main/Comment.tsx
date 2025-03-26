@@ -37,8 +37,9 @@ interface Icomment {
 type prop = {
   comment?: Icomment;
   currentUserName?: string;
+  index?: number;
 };
-const Comment = ({ comment, currentUserName }: prop) => {
+const Comment = ({ comment, currentUserName, index }: prop) => {
   const [editable, seteditable] = useState(false);
   const [dialog, setDialog] = useState(false);
 
@@ -63,11 +64,17 @@ const Comment = ({ comment, currentUserName }: prop) => {
           <p className="font-semibold text-sm md:text-lg text-dark-blue">
             {comment?.user.username}{" "}
           </p>
-          {currentUserName == comment?.user.username && <CurrentUser />}
+          {currentUserName === comment?.user.username && <CurrentUser />}
           <p className="text-grayish-blue text-sm md:text-lg">
             {comment?.createdAt}
           </p>
         </div>
+        <span>
+          {comment?.replies?.[index || 0]?.replyingTo
+            ? `@${comment.replies[index || 0].replyingTo}`
+            : ""}
+        </span>
+
         {!editable ? (
           <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
         ) : (
