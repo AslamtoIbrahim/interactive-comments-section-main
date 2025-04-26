@@ -1,5 +1,6 @@
 import React from "react";
 import Comment from "./Comment";
+import Reply from "./Reply";
 
 type prop = {
   username: string;
@@ -12,7 +13,7 @@ const CommentReply = ({ comment, username, index }: prop) => {
       <Comment comment={comment} currentUserName={username} index={index} />
       <div className="flex flex-col border-l border-grayish-blue/50 pl-4 gap-2">
         {comment.replies.map((reply: any, index: number) => (
-          <Comment
+          <Reply
             key={index}
             comment={reply}
             currentUserName={username}

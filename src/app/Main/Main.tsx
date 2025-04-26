@@ -5,6 +5,7 @@ import Response from "./Response";
 import CommentReply from "./CommentReply";
 
 const Main = () => {
+
   const [data, setdata] = useState<{ currentUser?: any; comments: any[] }>({
     currentUser: undefined,
     comments: [],
@@ -28,6 +29,7 @@ const Main = () => {
         .catch((error) => console.error(error));
     }
   }, []);
+  
   return (
     <div className="bg-very-light-gray  py-6 px-4 flex flex-col gap-2">
       {data.comments.map((comment, index) => (
