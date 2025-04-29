@@ -7,7 +7,7 @@ import DeleteButton from "./DeleteButton";
 import Picture from "./Picture";
 import Input from "./Input";
 import Button from "./Button";
-import Dialog from "../Dialog/Dialog";
+import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 
 interface Ireply {

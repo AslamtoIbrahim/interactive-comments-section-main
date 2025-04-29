@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Button from "../Main/Button";
+import Button from "../components/Button";
 
 type prop = {
   deleteClick?: () => void;

@@ -9,6 +9,7 @@ const Main = () => {
     comments: [],
   });
 
+
   // load initial data from data.json or localStorage
   useEffect(() => {
     console.log("hello json 😋");
