@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import Comment from "./Comment";
 import Reply from "./Reply";
+import { UserContext } from "./Main";
 
 type prop = {
-  username: string;
+  username?: string;
   comment: any;
   index?: number;
 };
 const CommentReply = ({ comment, username, index }: prop) => {
+  const useComent = useContext(UserContext);
+
   return (
     <div className="flex flex-col gap-4">
       <Comment comment={comment} currentUserName={username} index={index} />

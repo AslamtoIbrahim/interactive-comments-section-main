@@ -8,18 +8,19 @@ type prop = {
 }
 
 const ScoreButton = ({score, setOnclickScore}:prop) => {
-  const [scores, setscores] = useState(score ?? 0);
+  const [scores, setScores] = useState(score ?? 0);
+
 
   const handleIncrement = () => {
     if (setOnclickScore){
       setOnclickScore(scores + 1)
-      setscores(scores + 1)
+      setScores(scores + 1)
     }
   }
   const handleDecrement = () => {
     if (setOnclickScore && scores > 0){
       setOnclickScore(scores - 1)
-      setscores(scores - 1)
+      setScores(scores - 1)
     }
   }
   return (

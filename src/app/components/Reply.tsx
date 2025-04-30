@@ -7,8 +7,9 @@ import DeleteButton from "./DeleteButton";
 import Picture from "./Picture";
 import Input from "./Input";
 import Button from "./Button";
-import Dialog from "../Dialog/Dialog";
+import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
+import tiemAgo from "./Functions";
 
 interface Ireply {
   content: string;
@@ -67,7 +68,7 @@ const Reply = ({ comment, currentUserName, index }: prop) => {
             </p>
             {currentUserName === comment?.user.username && <CurrentUser />}
             <p className="text-grayish-blue text-sm md:text-lg">
-              {comment?.createdAt}
+              {tiemAgo(comment!.createdAt)}
             </p>
           </div>
           <span>
