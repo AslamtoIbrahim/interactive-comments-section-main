@@ -43,7 +43,13 @@ type reply = {
 
 type Action =
   | { type: "SET_COMMENTS"; payload: comment[] }
-  | { type: "ADD_COMMENT"; payload: comment };
+  | { type: "ADD_COMMENT"; payload: comment }
+  | { type: "EDIT_COMMENT"; payload: comment }
+  | {
+      type: "EDIT_REPLY";
+      payload: { id: number; reply: reply;};
+    }
+  | { type: "DELETE_COMMENT"; payload: comment };
 
 type contextType = {
   comments: comment[];
@@ -63,6 +69,37 @@ const Main = () => {
         const newComment = [...comments, action.payload];
         localStorage.setItem("comment", JSON.stringify(newComment));
         return newComment;
+      }
+      case "EDIT_COMMENT": {
+        const editedCom = comments.map((com) =>
+          com.id === action.payload.id ? { ...com, ...action.payload } : com
+        );
+        localStorage.setItem("comment", JSON.stringify(editedCom));
+        return editedCom;
+      }
+      case "EDIT_REPLY": {
+        const editedReply = comments.map((com) => {
+          if (com.id === action.payload.id) {
+            return {
+              ...com,
+              replies: com.replies.map((rep) =>
+                rep.id === action.payload.reply.id
+                  ? { ...rep, ...action.payload.reply }
+                  : rep
+              ),
+            };
+          }
+          return com;
+        });
+        localStorage.setItem("comment", JSON.stringify(editedReply));
+        return editedReply;
+      }
+      case "DELETE_COMMENT": {
+        const deletedCom = comments.filter(
+          (com) => com.id !== action.payload.id
+        );
+        localStorage.setItem("comment", JSON.stringify(deletedCom));
+        return deletedCom;
       }
       default:
         return comments;
@@ -93,9 +130,11 @@ const Main = () => {
   // load initial comments from data.json or localStorage
   useEffect(() => {
     console.log("😋 This is part of comments: ");
+    // localStorage.clear()
     const localComments = localStorage.getItem("comment");
     if (localComments) {
       setDispatchComments(JSON.parse(localComments));
+      console.log("🐙 localComments: ", localComments);
     } else {
       fetch("/data.json")
         .then((response) => response.json())
@@ -109,14 +148,10 @@ const Main = () => {
   }, []);
 
   return (
-    <div className="bg-very-light-gray h-fill  py-6 px-4 flex flex-col gap-2">
+    <div className="relative bg-very-light-gray h-fill  py-6 px-4 flex flex-col gap-2">
       <UserContext.Provider value={{ comments, dispatch }}>
         {comments.map((comm, ind) => (
-          <CommentReply
-            username={currentUser?.username}
-            comment={comm}
-            key={ind}
-          />
+          <CommentReply currentUser={currentUser} comment={comm} key={ind} />
         ))}
 
         <Response currentUser={currentUser} />
@@ -124,7 +159,5 @@ const Main = () => {
     </div>
   );
 };
-
- 
 
 export default Main;

@@ -44,6 +44,7 @@ const Response = ({ currentUser }: prop) => {
       return;
     }
 
+    // get the last id and add to it one so it add new id
     const nexId = Math.max(0, ...context!.comments.map((c) => c.id)) + 1;
     
     const newComment = {
@@ -61,6 +62,8 @@ const Response = ({ currentUser }: prop) => {
       replies: [] as reply[],
     };
     context?.dispatch({ type: "ADD_COMMENT", payload: newComment });
+    // clear the textarea after adding a comment
+    ref.current!.value = '';
   };
 
   return (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ScoreButton from "./ScoreButton";
 import CurrentUser from "./CurrentUser";
 import EditButton from "./EditButton";
@@ -10,19 +10,34 @@ import Button from "./Button";
 import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 import { UserContext } from "./Main";
-import tiemAgo from './Functions'
+import tiemAgo from "./Functions";
+import Response from "./Response";
+import ResReply from "./ResReply";
+
+interface IcurrentUser {
+  image: {
+    png: string;
+    webp: string;
+  };
+  username: string;
+}
 
 interface Ireply {
+  id: number;
   content: string;
   createdAt: string;
   score: number;
   replyingTo: string;
   user: {
-    png: string;
-    webp: string;
+    image: {
+      png: string;
+      webp: string;
+    };
+    username: string;
   };
 }
 interface Icomment {
+  id: number;
   content: string;
   createdAt: string;
   score: number;
@@ -38,26 +53,42 @@ interface Icomment {
 
 type prop = {
   comment?: Icomment;
-  currentUserName?: string;
+  currentUser?: IcurrentUser;
   index?: number;
 };
-const Comment = ({ comment, currentUserName, index }: prop) => {
+const Comment = ({ comment, currentUser, index }: prop) => {
   const [editable, seteditable] = useState(false);
   const [dialog, setDialog] = useState(false);
+  const [isReply, setIsReply] = useState(false);
+  const [isOpen, setisOpen] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
   const commentContext = useContext(UserContext);
 
-  console.log("😍", comment?.user.image.png);
+  const handleOpen = () => {
+    setisOpen((prev) => !prev);
+  };
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "visible";
+    }
+  }, [isOpen]);
 
   const handleEditClik = () => {
     seteditable(!editable);
   };
   const handleDialog = () => {
     setDialog(!dialog);
+    handleOpen();
   };
   const handleDelete = () => {
-    // delete comment logic here
-    localStorage.clear();
+    const deleteComment = { id: comment?.id };
+    commentContext?.dispatch({
+      type: "DELETE_COMMENT",
+      payload: deleteComment,
+    });
+    handleOpen();
     setDialog(false);
   };
 
@@ -66,53 +97,83 @@ const Comment = ({ comment, currentUserName, index }: prop) => {
     if (commentEdit === "") {
       return;
     }
+    const editedComment = {
+      id: comment?.id,
+      content: commentEdit,
+      createdAt: new Date().toISOString(),
+    };
+
+    commentContext?.dispatch({ type: "EDIT_COMMENT", payload: editedComment });
+    ref.current!.value = "";
+    seteditable(false);
   };
 
+  const handleReply = () => {
+    setIsReply(!isReply);
+    console.log('🧼 outside: ');
 
+  };
 
   return (
-    <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
-      <section className="w-full flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <Picture mb={comment?.user.image.png} dt={comment?.user.image.webp} />
-          <p className="font-semibold text-sm md:text-lg text-dark-blue">
-            {comment?.user.username}
-          </p>
-          {currentUserName === comment?.user.username && <CurrentUser />}
-          <p className="text-grayish-blue text-sm md:text-lg">
-            {tiemAgo(comment!.createdAt)}
-          </p>
-        </div>
-        {/* <span>
-          {comment?.replies?.[index || 0]?.replyingTo
-            ? `@${comment.replies[index || 0].replyingTo}`
-            : ""}
-        </span> */}
-
-        {!editable ? (
-          <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
-        ) : (
-          <section className="flex flex-col gap-2">
-            <Input text={comment?.content} ref={ref} />
-            <Button clcik={onUpdate} className="self-end px-3" text="Update" />
-          </section>
-        )}
-      </section>
-      <section className="flex items-center justify-between">
-        <ScoreButton score={comment?.score} />
-        <section className="md:absolute md:top-6 md:right-10">
-          {currentUserName == comment?.user.username ? (
-            <div className="flex items-center gap-3">
-              <DeleteButton onlcik={handleDialog} />
-              <EditButton onlcik={handleEditClik} />
-            </div>
+    <div className="flex flex-col gap-2">
+      <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
+        <section className="w-full flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Picture
+              mb={comment?.user.image.png}
+              dt={comment?.user.image.webp}
+            />
+            <p className="font-semibold text-sm md:text-lg text-dark-blue">
+              {comment?.user.username}
+            </p>
+            {currentUser?.username === comment?.user.username && (
+              <CurrentUser />
+            )}
+            <p className="text-grayish-blue text-sm md:text-lg">
+              {tiemAgo(comment!.createdAt)}
+            </p>
+          </div>
+          {/* <span>
+            {comment?.replies?.[index || 0]?.replyingTo
+              ? `@${comment.replies[index || 0].replyingTo}`
+              : ""}
+          </span> */}
+          {!editable ? (
+            <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
           ) : (
-            <ReplyButton />
+            <section className="flex flex-col gap-2">
+              <Input text={comment?.content} ref={ref} />
+              <Button
+                clcik={onUpdate}
+                className="self-end px-3"
+                text="Update"
+              />
+            </section>
           )}
         </section>
-      </section>
-      {dialog && (
-        <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+        <section className="flex items-center justify-between">
+          <ScoreButton score={comment?.score} />
+          <section className="md:absolute md:top-6 md:right-10">
+            {currentUser?.username == comment?.user.username ? (
+              <div className="flex items-center gap-3">
+                <DeleteButton onlcik={handleDialog} />
+                <EditButton onlcik={handleEditClik} />
+              </div>
+            ) : (
+              <ReplyButton onlcik={handleReply} />
+            )}
+          </section>
+        </section>
+        {dialog && (
+          <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+        )}
+      </div>
+      {isReply && (
+        <ResReply
+          comment={comment!}
+          currentUser={currentUser}
+          sendReply={handleReply}
+        />
       )}
     </div>
   );
