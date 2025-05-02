@@ -11,8 +11,7 @@ import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 import { UserContext } from "./Main";
 import tiemAgo from "./Functions";
-import Response from "./Response";
-import ResReply from "./ResReply";
+import ReplyToComment from "./ReplyToComment";
 
 interface IcurrentUser {
   image: {
@@ -54,33 +53,27 @@ interface Icomment {
 type prop = {
   comment?: Icomment;
   currentUser?: IcurrentUser;
-  index?: number;
 };
-const Comment = ({ comment, currentUser, index }: prop) => {
+const Comment = ({ comment, currentUser }: prop) => {
   const [editable, seteditable] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [isReply, setIsReply] = useState(false);
-  const [isOpen, setisOpen] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
   const commentContext = useContext(UserContext);
 
-  const handleOpen = () => {
-    setisOpen((prev) => !prev);
-  };
   useEffect(() => {
-    if (isOpen) {
+    if (dialog) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
-  }, [isOpen]);
+  }, [dialog]);
 
   const handleEditClik = () => {
     seteditable(!editable);
   };
   const handleDialog = () => {
     setDialog(!dialog);
-    handleOpen();
   };
   const handleDelete = () => {
     const deleteComment = { id: comment?.id };
@@ -88,7 +81,7 @@ const Comment = ({ comment, currentUser, index }: prop) => {
       type: "DELETE_COMMENT",
       payload: deleteComment,
     });
-    handleOpen();
+
     setDialog(false);
   };
 
@@ -110,8 +103,7 @@ const Comment = ({ comment, currentUser, index }: prop) => {
 
   const handleReply = () => {
     setIsReply(!isReply);
-    console.log('🧼 outside: ');
-
+    console.log("🧼 outside: ");
   };
 
   return (
@@ -169,10 +161,10 @@ const Comment = ({ comment, currentUser, index }: prop) => {
         )}
       </div>
       {isReply && (
-        <ResReply
+        <ReplyToComment
           comment={comment!}
           currentUser={currentUser}
-          sendReply={handleReply}
+          closeReplyBox={handleReply}
         />
       )}
     </div>

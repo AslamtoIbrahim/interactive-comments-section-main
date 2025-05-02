@@ -41,14 +41,13 @@ interface Icomment {
 type prop = {
   currentUser?: IcurrentUser;
   comment: Icomment;
-  index?: number;
 };
-const CommentReply = ({ comment, currentUser, index }: prop) => {
+const CommentReply = ({ comment, currentUser }: prop) => {
   // const useComent = useContext(UserContext);
 
   return (
     <div className="flex flex-col gap-4">
-      <Comment comment={comment} currentUser={currentUser} index={index} />
+      <Comment comment={comment} currentUser={currentUser} />
       <div className="flex flex-col border-l border-grayish-blue/50 pl-4 gap-2">
         {comment.replies.map((reply, index) => (
           <Reply
@@ -56,7 +55,6 @@ const CommentReply = ({ comment, currentUser, index }: prop) => {
             key={index}
             reply={reply}
             currentUser={currentUser}
-            index={index}
           />
         ))}
       </div>

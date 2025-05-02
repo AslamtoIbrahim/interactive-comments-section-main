@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState, useEffect } from "react";
 import ScoreButton from "./ScoreButton";
 import CurrentUser from "./CurrentUser";
 import EditButton from "./EditButton";
@@ -11,6 +11,7 @@ import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 import tiemAgo from "./Functions";
 import { UserContext } from "./Main";
+import ReplyToReply from "./ReplyToReply";
 
 interface IcurrentUser {
   image: {
@@ -54,12 +55,12 @@ type prop = {
   comment?: Icomment;
   reply?: Ireply;
   currentUser?: IcurrentUser;
-  index?: number;
 };
 
-const Reply = ({ comment, reply, currentUser, index }: prop) => {
+const Reply = ({ comment, reply, currentUser }: prop) => {
   const [editable, seteditable] = useState(false);
   const [dialog, setDialog] = useState(false);
+  const [isReply, setIsReply] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
   const contextRely = useContext(UserContext);
 
@@ -71,75 +72,120 @@ const Reply = ({ comment, reply, currentUser, index }: prop) => {
   };
   const handleDelete = () => {
     // delete comment logic here
+    const repl = {
+      id: reply?.id,
+    };
+
+    const comRepl = {
+      id: comment?.id,
+      reply: repl,
+    };
+    contextRely?.dispatch({ type: "DELETE_REPLY", payload: comRepl });
     setDialog(false);
+  };
+
+  
+
+  useEffect(() => {
+    if (dialog) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "visible";
+    }
+  }, [dialog]);
+
+  useEffect(()=>{
+    // add user replying to and the content togather
+    if (ref.current) {
+      ref.current!.value = `@${reply?.replyingTo}` + ' ' + reply?.content;
+    }
+  },[editable])
+
+  const handleReply = () => {
+    setIsReply(!isReply);
+    console.log("🧼 outside: ");
   };
 
   const editReply = () => {
     const editinput = ref.current!.value;
-    if (editinput.trim() === reply?.user.username.trim() || editinput === "") {
+    if (editinput.trim() === reply?.replyingTo.trim() || editinput === "") {
       seteditable(!editable);
       return;
     }
 
+    console.log('🎃 username: ', reply?.user.username)
+    console.log('🎃 replyingto: ', reply?.replyingTo)
+    // delete @username from the content before adding it
+    const text = editinput.replace(`@${reply?.replyingTo} `, '');
     const rep = {
       id: reply?.id,
-      content: editinput,
+      content: text,
       createdAt: new Date().toISOString(),
-    }
+    };
     const editReply = {
       id: comment?.id,
       reply: rep,
     };
 
     contextRely?.dispatch({ type: "EDIT_REPLY", payload: editReply });
-    ref.current!.value = ''
+    ref.current!.value = "";
     seteditable(!editable);
-
   };
 
   return (
-    <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
-      <section className="w-full flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <Picture mb={reply?.user.image.png} dt={reply?.user.image.webp} />
-          <p className="font-semibold text-sm md:text-lg text-dark-blue">
-            {reply?.user.username}{" "}
-          </p>
-          {currentUser?.username === reply?.user.username && <CurrentUser />}
-          <p className="text-grayish-blue text-sm md:text-lg">
-            {tiemAgo(reply!.createdAt)}
-          </p>
-        </div>
-        {/* <span>
-          {reply?.replies?.[index || 0]?.replyingTo
-            ? `@${reply.replies[index || 0].replyingTo}`
-            : ""}
-        </span> */}
+    <div className="flex flex-col gap-2">
+      <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
+        <section className="w-full flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Picture mb={reply?.user.image.png} dt={reply?.user.image.webp} />
+            <p className="font-semibold text-sm md:text-lg text-dark-blue">
+              {reply?.user.username}{" "}
+            </p>
+            {currentUser?.username === reply?.user.username && <CurrentUser />}
+            <p className="text-grayish-blue text-sm md:text-lg">
+              {tiemAgo(reply!.createdAt)}
+            </p>
+          </div>
 
-        {!editable ? (
-          <p className="text-grayish-blue md:text-lg">{reply?.content}</p>
-        ) : (
-          <section className="flex flex-col gap-2">
-            <Input text={reply?.content} ref={ref} />
-            <Button className="self-end px-3" text="Update" clcik={editReply} />
-          </section>
-        )}
-      </section>
-      <section className="flex items-center justify-between">
-        <ScoreButton score={reply?.score} />
-        <section className="md:absolute md:top-6 md:right-10">
-          {currentUser?.username == reply?.user.username ? (
-            <div className="flex items-center gap-3">
-              <DeleteButton onlcik={handleDialog} />
-              <EditButton onlcik={handleEditClik} />
-            </div>
+          {!editable ? (
+            <p className="text-grayish-blue md:text-lg">
+              <span className="text-moderate-blue font-medium">{`@${reply?.replyingTo}`}</span> {reply?.content}
+            </p>
           ) : (
-            <ReplyButton />
+            <section className="flex flex-col gap-2">
+              <Input text={reply?.content} ref={ref} />
+              <Button
+                className="self-end px-3"
+                text="Update"
+                clcik={editReply}
+              />
+            </section>
           )}
         </section>
-      </section>
-      {dialog && (
-        <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+        <section className="flex items-center justify-between">
+          <ScoreButton score={reply?.score} />
+          <section className="md:absolute md:top-6 md:right-10">
+            {currentUser?.username == reply?.user.username ? (
+              <div className="flex items-center gap-3">
+                <DeleteButton onlcik={handleDialog} />
+                <EditButton onlcik={handleEditClik} />
+              </div>
+            ) : (
+              <ReplyButton onlcik={handleReply} />
+            )}
+          </section>
+        </section>
+        {dialog && (
+          <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+        )}
+      </div>
+      {isReply && (
+        <ReplyToReply
+          comment={comment!}
+          currentUser={currentUser}
+          reply={reply!}
+          closeReplyBox={handleReply}
+        />
       )}
     </div>
   );

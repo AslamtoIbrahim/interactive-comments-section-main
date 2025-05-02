@@ -16,7 +16,7 @@ const Dialog = ({ deleteClick , cancelClick}: prop) => {
       deleteClick?.();
   };
   return (
-    <div className={`bg-black/65 inset-0 w-full h-screen fixed flex items-center justify-center
+    <div className={`bg-black/65 inset-0 w-full h-screen fixed z-10 flex items-center justify-center
      ${canceled && `hidden`}`}>
 
 

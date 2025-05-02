@@ -47,9 +47,10 @@ type Action =
   | { type: "EDIT_COMMENT"; payload: comment }
   | {
       type: "EDIT_REPLY";
-      payload: { id: number; reply: reply;};
+      payload: { id: number; reply: reply };
     }
-  | { type: "DELETE_COMMENT"; payload: comment };
+  | { type: "DELETE_COMMENT"; payload: comment }
+  | { type: "DELETE_REPLY"; payload: { id: number; reply: reply } };
 
 type contextType = {
   comments: comment[];
@@ -100,6 +101,34 @@ const Main = () => {
         );
         localStorage.setItem("comment", JSON.stringify(deletedCom));
         return deletedCom;
+      }
+      case "DELETE_REPLY": {
+        // const deleteRep = comments.map((com) => {
+        //   if (com.id === action.payload.id) {
+        //     {
+        //       return {
+        //         ...com,
+        //         replies: com.replies.filter(
+        //           (rep) => rep.id !== action.payload.reply.id
+        //         ),
+        //       };
+        //     }
+        //   }
+        //   return com;
+        // });
+
+        const deleteRep = comments.map((com) =>
+          com.id === action.payload.id
+            ? {
+                ...com,
+                replies: com.replies.filter(
+                  (rep) => rep.id !== action.payload.reply.id
+                ),
+              }
+            : com
+        );
+        localStorage.setItem("comment", JSON.stringify(deleteRep));
+        return deleteRep;
       }
       default:
         return comments;

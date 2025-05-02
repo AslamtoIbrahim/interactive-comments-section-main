@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { UserContext } from "./Main";
 import Input from "./Input";
 import Picture from "./Picture";
 import Button from "./Button";
+import { UserContext } from "./Main";
 
 interface IcurrentUser {
   image: {
@@ -43,57 +43,60 @@ interface Ireply {
 }
 
 type prop = {
-  comment: Icomment;
   currentUser?: IcurrentUser;
-  sendReply: () => void;
+  comment: Icomment;
+  reply: Ireply;
+  closeReplyBox: () => void;
 };
-
-const ResReply = ({ currentUser, comment, sendReply }: prop) => {
+const ReplyToReply = ({ currentUser, comment, reply, closeReplyBox }: prop) => {
   const ref = useRef<HTMLTextAreaElement>(null);
-
+  let usernameToReply: string;
   const context = useContext(UserContext);
-
-  const atusername = `@${comment.user.username} `;
-
   useEffect(() => {
-    //  add @ and username of the replyingTo in textarea
-    ref.current!.value = atusername;
+    // add @ sign to the user we are replying to and set it textarea
+    usernameToReply = `@${reply.user.username} `;
+    ref.current!.value = usernameToReply;
   }, []);
+
+
+  
 
   const setReply = () => {
     const replyText = ref.current!.value;
 
-    if (replyText.trim() === atusername.trim() || replyText.trim() === "") {
-      sendReply();
+    if (
+      replyText.trim() === usernameToReply.trim() ||
+      replyText.trim() === ""
+    ) {
+      closeReplyBox();
       return;
     }
-
-    // get new id for new reply
-    const nexId = Math.max(0, ...comment.replies.map(re => re.id)) + 1;
+    // generate a new id for this new reply to the reply
+    const newId = Math.max(0, ...comment.replies.map((c) => c.id)) + 1;
+    // remove the usernameToReply from the text before adding it
+    const text = replyText.replace(usernameToReply, '');
     const newReply = {
-        id: nexId,
-        content: replyText,
-        createdAt: new Date().toISOString(),
-        score: 0,
-        replyingTo: comment.user.username,
-        user: {
-          image: {
-            png: currentUser?.image.png as string,
-            webp: currentUser?.image.webp as string,
-          },
-          username: currentUser?.username as string,
-        }
-      }
-
+      id: newId,
+      content: text,
+      createdAt: new Date().toISOString(),
+      score: 0,
+      replyingTo: reply.user.username,
+      user: {
+        image: {
+          png: currentUser?.image.png as string,
+          webp: currentUser?.image.webp as string,
+        },
+        username: currentUser?.username as string,
+      },
+    };
     const updatedComment = {
-        id: comment.id,
-        replies: [...comment.replies, newReply],
-    }
-    context?.dispatch({type:'EDIT_COMMENT', payload: updatedComment})
-    ref.current!.value = ''
-    sendReply();
+      id: comment.id,
+      replies: [...comment.replies, newReply],
+    };
+    context?.dispatch({ type: "EDIT_COMMENT", payload: updatedComment });
+    ref.current!.value = "";
+    closeReplyBox();
   };
-
   return (
     <div className="bg-white p-4 rounded-md font-rubik flex flex-col gap-3">
       <Input ref={ref} />
@@ -105,4 +108,4 @@ const ResReply = ({ currentUser, comment, sendReply }: prop) => {
   );
 };
 
-export default ResReply;
+export default ReplyToReply;
