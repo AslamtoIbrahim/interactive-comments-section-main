@@ -1,35 +1,65 @@
-'use client'
-import React, { useState } from 'react'
+"use client";
+import React, { useRef, useState } from "react";
 
 type prop = {
-  score?: number
-  setOnclickScore?: (score: number) => void;
-  
-}
+  voting: string;
+  score?: number;
+  setOnVoteListener?: (vote: string) => void;
+  setOnScoreListener?: (score: number) => void;
+};
 
-const ScoreButton = ({score, setOnclickScore}:prop) => {
+const ScoreButton = ({
+  voting,
+  score,
+  setOnVoteListener,
+  setOnScoreListener,
+}: prop) => {
   const [scores, setScores] = useState(score ?? 0);
-
+  const votes = useRef<string>(voting);
+  console.log("votes 🌐:   ", votes.current);
 
   const handleIncrement = () => {
-    if (setOnclickScore){
-      setOnclickScore(scores + 1)
-      setScores(scores + 1)
-    }
-  }
-  const handleDecrement = () => {
-    if (setOnclickScore && scores > 0){
-      setOnclickScore(scores - 1)
-      setScores(scores - 1)
-    }
-  }
-  return (
-    <div className='bg-very-light-gray text-moderate-blue/55  w-fit font-rubik font-medium  md:text-lg py-1 px-3 md:px-4 rounded-lg flex md:flex-col items-center   gap-4 md:gap-2  '>
-      <button onClick={handleIncrement} className='cursor-pointer hover:text-moderate-blue'>+</button>
-      <p className='text-moderate-blue'>{scores}</p>
-      <button onClick={handleDecrement} className='cursor-pointer hover:text-moderate-blue'>-</button>
-    </div>
-  )
-}
+    console.log("befor testing voests 🔵  ", votes.current);
+    if (votes.current === "up") return;
 
-export default ScoreButton
+    console.log("votes ✅  ", votes.current);
+    const newVote = votes.current === "" ? "up" : "";
+    votes.current = newVote;
+    setOnVoteListener?.(newVote);
+
+    const newScore = scores + 1;
+    setScores(newScore);
+    setOnScoreListener?.(newScore);
+  };
+
+  const handleDecrement = () => {
+    if (votes.current === "down") return;
+
+    const newVote = votes.current === "" ? "down" : "";
+    votes.current = newVote;
+    setOnVoteListener?.(newVote);
+
+    const newScore = scores - 1;
+    setScores(newScore);
+    setOnScoreListener?.(newScore);
+  };
+  return (
+    <div className="bg-very-light-gray text-moderate-blue/55  w-fit font-rubik font-medium  md:text-lg py-1 px-3 md:px-4 rounded-lg flex md:flex-col items-center   gap-4 md:gap-2  ">
+      <button
+        onClick={handleIncrement}
+        className="cursor-pointer hover:text-moderate-blue"
+      >
+        +
+      </button>
+      <p className="text-moderate-blue">{scores}</p>
+      <button
+        onClick={handleDecrement}
+        className="cursor-pointer hover:text-moderate-blue"
+      >
+        -
+      </button>
+    </div>
+  );
+};
+
+export default ScoreButton;

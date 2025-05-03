@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import ScoreButton from "./ScoreButton";
 import CurrentUser from "./CurrentUser";
 import EditButton from "./EditButton";
@@ -50,42 +50,61 @@ interface Icomment {
   replies: Ireply[];
 }
 
+type voteReplies = {
+  id: number;
+  vote: string;
+};
+
+type commentVotes = {
+  id: number;
+  vote: string;
+  voteReplies: voteReplies[];
+};
+
 type prop = {
   comment?: Icomment;
   currentUser?: IcurrentUser;
 };
 const Comment = ({ comment, currentUser }: prop) => {
-  const [editable, seteditable] = useState(false);
-  const [dialog, setDialog] = useState(false);
-  const [isReply, setIsReply] = useState(false);
+  const [isCommentEditVisible, setIsCommentEditVisible] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [isReplyVisible, setIsReplyVisible] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
   const commentContext = useContext(UserContext);
+  const voteValue = useMemo(() => {
+    const votes = localStorage.getItem("votes");
+    if (votes) {
+      const listvotes: commentVotes[] = JSON.parse(votes);
+      return listvotes.find((vo) => vo.id === comment?.id)?.vote ?? "";
+    }
+    return "";
+  }, [comment?.id]);
 
   useEffect(() => {
-    if (dialog) {
+    if (isDialogVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
-  }, [dialog]);
+  }, [isDialogVisible]);
 
-  const handleEditClik = () => {
-    seteditable(!editable);
+  const onButtonEditClick = () => {
+    setIsCommentEditVisible(!isCommentEditVisible);
   };
-  const handleDialog = () => {
-    setDialog(!dialog);
+  const showAndHideDialog = () => {
+    setIsDialogVisible(!isDialogVisible);
   };
-  const handleDelete = () => {
-    const deleteComment = { id: comment?.id };
+  const deleteComment = () => {
+    const targetComment = { id: comment?.id };
     commentContext?.dispatch({
       type: "DELETE_COMMENT",
-      payload: deleteComment,
+      payload: targetComment,
     });
 
-    setDialog(false);
+    setIsDialogVisible(false);
   };
 
-  const onUpdate = () => {
+  const updateComment = () => {
     const commentEdit = ref.current!.value;
     if (commentEdit === "") {
       return;
@@ -98,12 +117,46 @@ const Comment = ({ comment, currentUser }: prop) => {
 
     commentContext?.dispatch({ type: "EDIT_COMMENT", payload: editedComment });
     ref.current!.value = "";
-    seteditable(false);
+    setIsCommentEditVisible(false);
   };
 
-  const handleReply = () => {
-    setIsReply(!isReply);
+  const showAndHideReplyBox = () => {
+    setIsReplyVisible(!isReplyVisible);
     console.log("🧼 outside: ");
+  };
+
+  const onVoteClick = (votes: string) => {
+    if (comment?.user.username === currentUser?.username) return;
+
+    // localStorage.removeItem("votes");
+    console.log("votes 🎫 : ", votes);
+
+    // add a new vote if there is none for this comment
+    const localVotes = localStorage.getItem("votes");
+    if (localVotes) {
+      const newVote = {
+        id: comment?.id,
+        vote: votes,
+      };
+      const list: commentVotes[] = JSON.parse(localVotes);
+      const newVoteList = list.map((vo) =>
+        vo.id === comment?.id ? { ...vo, ...newVote } : vo
+      );
+      localStorage.setItem("votes", JSON.stringify(newVoteList));
+    }
+
+    console.log("localStorage Votes :🎑:  ", localStorage.getItem("votes"));
+  };
+
+  const onScoreClick = (score: number) => {
+    if (comment?.user.username === currentUser?.username) return;
+
+    if (!score) return;
+    const updatedScore = {
+      id: comment?.id,
+      score: score,
+    };
+    commentContext?.dispatch({ type: "EDIT_COMMENT", payload: updatedScore });
   };
 
   return (
@@ -125,18 +178,13 @@ const Comment = ({ comment, currentUser }: prop) => {
               {tiemAgo(comment!.createdAt)}
             </p>
           </div>
-          {/* <span>
-            {comment?.replies?.[index || 0]?.replyingTo
-              ? `@${comment.replies[index || 0].replyingTo}`
-              : ""}
-          </span> */}
-          {!editable ? (
+          {!isCommentEditVisible ? (
             <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
           ) : (
             <section className="flex flex-col gap-2">
               <Input text={comment?.content} ref={ref} />
               <Button
-                clcik={onUpdate}
+                clcik={updateComment}
                 className="self-end px-3"
                 text="Update"
               />
@@ -144,27 +192,32 @@ const Comment = ({ comment, currentUser }: prop) => {
           )}
         </section>
         <section className="flex items-center justify-between">
-          <ScoreButton score={comment?.score} />
+          <ScoreButton
+            voting={voteValue}
+            score={comment?.score}
+            setOnVoteListener={onVoteClick}
+            setOnScoreListener={onScoreClick}
+          />
           <section className="md:absolute md:top-6 md:right-10">
             {currentUser?.username == comment?.user.username ? (
               <div className="flex items-center gap-3">
-                <DeleteButton onlcik={handleDialog} />
-                <EditButton onlcik={handleEditClik} />
+                <DeleteButton onlcik={showAndHideDialog} />
+                <EditButton onlcik={onButtonEditClick} />
               </div>
             ) : (
-              <ReplyButton onlcik={handleReply} />
+              <ReplyButton onlcik={showAndHideReplyBox} />
             )}
           </section>
         </section>
-        {dialog && (
-          <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+        {isDialogVisible && (
+          <Dialog cancelClick={showAndHideDialog} deleteClick={deleteComment} />
         )}
       </div>
-      {isReply && (
+      {isReplyVisible && (
         <ReplyToComment
           comment={comment!}
           currentUser={currentUser}
-          closeReplyBox={handleReply}
+          closeReplyBox={showAndHideReplyBox}
         />
       )}
     </div>

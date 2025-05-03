@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useRef, useState, useEffect } from "react";
+import React, { useContext, useRef, useState, useEffect, useMemo } from "react";
 import ScoreButton from "./ScoreButton";
 import CurrentUser from "./CurrentUser";
 import EditButton from "./EditButton";
@@ -51,6 +51,17 @@ interface Ireply {
   };
 }
 
+type voteReplies = {
+  id: number;
+  vote: string;
+};
+
+type commentVotes = {
+  id: number;
+  vote: string;
+  voteReplies: voteReplies[];
+};
+
 type prop = {
   comment?: Icomment;
   reply?: Ireply;
@@ -63,6 +74,21 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
   const [isReply, setIsReply] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
   const contextRely = useContext(UserContext);
+  // const votingRef = useRef<string>("");
+  const voteReplyValue = useMemo(() => {
+    const localVotes = localStorage.getItem("votes");
+    if (localVotes) {
+      const listOfVotes: commentVotes[] = JSON.parse(localVotes);
+      const foundVoteComment = listOfVotes.find((cv) => cv.id === comment?.id);
+      if (foundVoteComment && Array.isArray(foundVoteComment?.voteReplies)) {
+        const foundVote = foundVoteComment?.voteReplies.find(
+          (rv) => rv.id === reply?.id
+        );
+        return foundVote?.vote || "";
+      }
+    }
+    return "";
+  }, [comment?.id, reply?.id]);
 
   const handleEditClik = () => {
     seteditable(!editable);
@@ -84,8 +110,6 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
     setDialog(false);
   };
 
-  
-
   useEffect(() => {
     if (dialog) {
       document.body.style.overflow = "hidden";
@@ -94,12 +118,12 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
     }
   }, [dialog]);
 
-  useEffect(()=>{
+  useEffect(() => {
     // add user replying to and the content togather
     if (ref.current) {
-      ref.current!.value = `@${reply?.replyingTo}` + ' ' + reply?.content;
+      ref.current!.value = `@${reply?.replyingTo}` + " " + reply?.content;
     }
-  },[editable])
+  }, [editable]);
 
   const handleReply = () => {
     setIsReply(!isReply);
@@ -113,10 +137,10 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
       return;
     }
 
-    console.log('🎃 username: ', reply?.user.username)
-    console.log('🎃 replyingto: ', reply?.replyingTo)
+    console.log("🎃 username: ", reply?.user.username);
+    console.log("🎃 replyingto: ", reply?.replyingTo);
     // delete @username from the content before adding it
-    const text = editinput.replace(`@${reply?.replyingTo} `, '');
+    const text = editinput.replace(`@${reply?.replyingTo} `, "");
     const rep = {
       id: reply?.id,
       content: text,
@@ -130,6 +154,49 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
     contextRely?.dispatch({ type: "EDIT_REPLY", payload: editReply });
     ref.current!.value = "";
     seteditable(!editable);
+  };
+
+  const onVoteReplyClick = (vote: string) => {
+    if (reply?.user.username === currentUser?.username) return;
+
+    const localVote = localStorage.getItem("votes");
+    if (localVote) {
+      const newVoteForReply = {
+        id: reply?.id,
+        vote: vote,
+      };
+      const listOfVotes: commentVotes[] = JSON.parse(localVote);
+      const newListOfVotes = listOfVotes.map((cv) =>
+        cv.id === comment?.id
+          ? {
+              ...cv,
+              voteReplies: cv.voteReplies.map((rv) =>
+                rv.id === reply?.id ? { ...rv, ...newVoteForReply } : rv
+              ),
+            }
+          : cv
+      );
+      console.log("newListOfVotes 🧡 ", newListOfVotes);
+      console.log("vote::::> ", vote);
+      localStorage.setItem("votes", JSON.stringify(newListOfVotes));
+      console.log("localVote: ▶🚹 ", localVote);
+    }
+  };
+
+  const onScoreReplyClick = (score: number) => {
+    if (reply?.user.username === currentUser?.username) return;
+
+    if (!score) return;
+    const scoreReply = {
+      id: reply?.id,
+      score: score,
+    };
+
+    const scoreComent = {
+      id: comment?.id,
+      reply: scoreReply,
+    };
+    contextRely?.dispatch({ type: "EDIT_REPLY", payload: scoreComent });
   };
 
   return (
@@ -149,7 +216,8 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
 
           {!editable ? (
             <p className="text-grayish-blue md:text-lg">
-              <span className="text-moderate-blue font-medium">{`@${reply?.replyingTo}`}</span> {reply?.content}
+              <span className="text-moderate-blue font-medium">{`@${reply?.replyingTo}`}</span>{" "}
+              {reply?.content}
             </p>
           ) : (
             <section className="flex flex-col gap-2">
@@ -163,7 +231,12 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
           )}
         </section>
         <section className="flex items-center justify-between">
-          <ScoreButton score={reply?.score} />
+          <ScoreButton
+            voting={voteReplyValue}
+            score={reply?.score}
+            setOnVoteListener={onVoteReplyClick}
+            setOnScoreListener={onScoreReplyClick}
+          />
           <section className="md:absolute md:top-6 md:right-10">
             {currentUser?.username == reply?.user.username ? (
               <div className="flex items-center gap-3">

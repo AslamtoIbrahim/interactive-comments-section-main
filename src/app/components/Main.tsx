@@ -103,20 +103,6 @@ const Main = () => {
         return deletedCom;
       }
       case "DELETE_REPLY": {
-        // const deleteRep = comments.map((com) => {
-        //   if (com.id === action.payload.id) {
-        //     {
-        //       return {
-        //         ...com,
-        //         replies: com.replies.filter(
-        //           (rep) => rep.id !== action.payload.reply.id
-        //         ),
-        //       };
-        //     }
-        //   }
-        //   return com;
-        // });
-
         const deleteRep = comments.map((com) =>
           com.id === action.payload.id
             ? {
@@ -163,7 +149,7 @@ const Main = () => {
     const localComments = localStorage.getItem("comment");
     if (localComments) {
       setDispatchComments(JSON.parse(localComments));
-      console.log("🐙 localComments: ", localComments);
+      // console.log("🐙 localComments: ", localComments);
     } else {
       fetch("/data.json")
         .then((response) => response.json())
@@ -175,6 +161,24 @@ const Main = () => {
         .catch((error) => console.error(error));
     }
   }, []);
+
+  useEffect(() => {
+    if (!comments || comments.length === 0) return;
+    const localOfVotes = localStorage.getItem("votes");
+    if (!localOfVotes) {
+      const voteList = comments.map((co) => {
+        return {
+          id: co.id,
+          vote: "",
+          voteReplies: co.replies.map((re) => {
+            return { id: re.id, vote: "" };
+          }),
+        };
+      });
+      console.log("list of votes 🌄 ☔ ", voteList);
+      localStorage.setItem("votes", JSON.stringify(voteList));
+    }
+  }, [comments]);
 
   return (
     <div className="relative bg-very-light-gray h-fill  py-6 px-4 flex flex-col gap-2">
