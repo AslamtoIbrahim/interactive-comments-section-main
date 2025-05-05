@@ -102,7 +102,7 @@ const ReplyToReply = ({ currentUser, comment, reply, closeReplyBox }: prop) => {
       <Input ref={ref} />
       <section className="flex items-center justify-between">
         <Picture mb={currentUser?.image.png} dt={currentUser?.image.webp} />
-        <Button clcik={setReply} text="Reply" />
+        <Button onClick={setReply} text="Reply" />
       </section>
     </div>
   );

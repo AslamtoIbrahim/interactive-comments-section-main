@@ -12,7 +12,7 @@ interface IcurrentUser {
   username: string;
 }
 
-type prop = {
+type ResponseProps = {
   currentUser?: IcurrentUser;
 };
 
@@ -31,7 +31,18 @@ type reply = {
   };
 };
 
-const Response = ({ currentUser }: prop) => {
+type voteReplies = {
+  id: number;
+  vote: string;
+};
+
+type commentVotes = {
+  id: number;
+  vote: string;
+  voteReplies: voteReplies[];
+};
+
+const Response = ({ currentUser }: ResponseProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const context = useContext(UserContext);
@@ -46,7 +57,7 @@ const Response = ({ currentUser }: prop) => {
 
     // get the last id and add to it one so it add new id
     const nexId = Math.max(0, ...context!.comments.map((c) => c.id)) + 1;
-    
+
     const newComment = {
       id: nexId,
       content: comment,
@@ -63,7 +74,23 @@ const Response = ({ currentUser }: prop) => {
     };
     context?.dispatch({ type: "ADD_COMMENT", payload: newComment });
     // clear the textarea after adding a comment
-    ref.current!.value = '';
+    ref.current!.value = "";
+    // add a new vote for this new comment
+    addNewVote(nexId);
+  };
+
+  const addNewVote = (id: number) => {
+    const localVotes = localStorage.getItem("votes");
+    if (localVotes) {
+      const listVotes: commentVotes[] = JSON.parse(localVotes);
+      const newObjectVote = {
+        id: id,
+        vote: "",
+        voteReplies: [],
+      };
+      const newListVote = [...listVotes, newObjectVote];
+      localStorage.setItem("votes", JSON.stringify(newListVote));
+    }
   };
 
   return (
@@ -71,7 +98,7 @@ const Response = ({ currentUser }: prop) => {
       <Input ref={ref} />
       <section className="flex items-center justify-between">
         <Picture mb={currentUser?.image.png} dt={currentUser?.image.webp} />
-        <Button clcik={sendClick} />
+        <Button onClick={sendClick} />
       </section>
     </div>
   );

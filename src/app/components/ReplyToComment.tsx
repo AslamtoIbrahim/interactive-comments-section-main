@@ -42,13 +42,25 @@ interface Ireply {
   };
 }
 
-type prop = {
+type voteReplies = {
+  id: number;
+  vote: string;
+};
+
+type commentVotes = {
+  id: number;
+  vote: string;
+  voteReplies: voteReplies[];
+};
+
+
+type RplyBoxProps = {
   comment: Icomment;
   currentUser?: IcurrentUser;
   closeReplyBox: () => void;
 };
 
-const ReplyToComment = ({ currentUser, comment, closeReplyBox }: prop) => {
+const ReplyToComment = ({ currentUser, comment, closeReplyBox }: RplyBoxProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const context = useContext(UserContext);
@@ -92,6 +104,25 @@ const ReplyToComment = ({ currentUser, comment, closeReplyBox }: prop) => {
     context?.dispatch({type:'EDIT_COMMENT', payload: updatedComment})
     ref.current!.value = ''
     closeReplyBox();
+    // add a new vote for this new reply in the camment
+    addNewVote(nexId);
+  };
+
+  const addNewVote = (id: number) => {
+    const localVotes = localStorage.getItem("votes");
+    if (localVotes) {
+      const listVotes: commentVotes[] = JSON.parse(localVotes);
+      const replyVote = {
+        id: id,
+        vote: "",
+      };
+      const newObjectVote = {
+        id: comment.id,
+        voteReplies: replyVote
+      }
+      const newListVote = listVotes.map(cv => cv.id === comment.id ? {...cv, ...newObjectVote} : cv);
+      localStorage.setItem("votes", JSON.stringify(newListVote));
+    }
   };
 
   return (
@@ -99,7 +130,7 @@ const ReplyToComment = ({ currentUser, comment, closeReplyBox }: prop) => {
       <Input ref={ref} />
       <section className="flex items-center justify-between">
         <Picture mb={currentUser?.image.png} dt={currentUser?.image.webp} />
-        <Button clcik={setReply} text="Reply" />
+        <Button onClick={setReply} text="Reply" />
       </section>
     </div>
   );

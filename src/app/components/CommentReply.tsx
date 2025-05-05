@@ -38,11 +38,11 @@ interface Icomment {
   replies: Ireply[];
 }
 
-type prop = {
+type InteractiveComment = {
   currentUser?: IcurrentUser;
   comment: Icomment;
 };
-const CommentReply = ({ comment, currentUser }: prop) => {
+const CommentReply = ({ comment, currentUser }: InteractiveComment) => {
   // const useComent = useContext(UserContext);
 
   return (

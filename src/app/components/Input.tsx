@@ -1,9 +1,12 @@
 import React, { ForwardedRef, useState } from "react";
 
-type prop = {
+interface InputValue {
   text?: string;
-};
-const InputInner = ({ text }: prop, ref: ForwardedRef<HTMLTextAreaElement>) => {
+}
+const InputInner = (
+  { text }: InputValue,
+  ref: ForwardedRef<HTMLTextAreaElement>
+) => {
   const [textValue, setTextValue] = useState(text);
   const handleOnchneg = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextValue(e.target.value);

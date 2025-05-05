@@ -1,19 +1,19 @@
 "use client";
 import React, { useRef, useState } from "react";
 
-type prop = {
+interface ButtonProps {
   voting: string;
   score?: number;
   setOnVoteListener?: (vote: string) => void;
   setOnScoreListener?: (score: number) => void;
-};
+}
 
 const ScoreButton = ({
   voting,
   score,
   setOnVoteListener,
   setOnScoreListener,
-}: prop) => {
+}: ButtonProps) => {
   const [scores, setScores] = useState(score ?? 0);
   const votes = useRef<string>(voting);
   console.log("votes 🌐:   ", votes.current);

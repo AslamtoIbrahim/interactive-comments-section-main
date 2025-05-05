@@ -184,7 +184,7 @@ const Comment = ({ comment, currentUser }: prop) => {
             <section className="flex flex-col gap-2">
               <Input text={comment?.content} ref={ref} />
               <Button
-                clcik={updateComment}
+                onClick={updateComment}
                 className="self-end px-3"
                 text="Update"
               />
@@ -201,11 +201,11 @@ const Comment = ({ comment, currentUser }: prop) => {
           <section className="md:absolute md:top-6 md:right-10">
             {currentUser?.username == comment?.user.username ? (
               <div className="flex items-center gap-3">
-                <DeleteButton onlcik={showAndHideDialog} />
-                <EditButton onlcik={onButtonEditClick} />
+                <DeleteButton onClick={showAndHideDialog} />
+                <EditButton onClick={onButtonEditClick} />
               </div>
             ) : (
-              <ReplyButton onlcik={showAndHideReplyBox} />
+              <ReplyButton onClick={showAndHideReplyBox} />
             )}
           </section>
         </section>

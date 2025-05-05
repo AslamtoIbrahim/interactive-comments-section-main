@@ -225,7 +225,7 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
               <Button
                 className="self-end px-3"
                 text="Update"
-                clcik={editReply}
+                onClick={editReply}
               />
             </section>
           )}
@@ -240,11 +240,11 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
           <section className="md:absolute md:top-6 md:right-10">
             {currentUser?.username == reply?.user.username ? (
               <div className="flex items-center gap-3">
-                <DeleteButton onlcik={handleDialog} />
-                <EditButton onlcik={handleEditClik} />
+                <DeleteButton onClick={handleDialog} />
+                <EditButton onClick={handleEditClik} />
               </div>
             ) : (
-              <ReplyButton onlcik={handleReply} />
+              <ReplyButton onClick={handleReply} />
             )}
           </section>
         </section>

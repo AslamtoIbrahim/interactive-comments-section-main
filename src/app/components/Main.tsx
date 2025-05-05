@@ -3,7 +3,7 @@ import React, { useEffect, useReducer, useState, createContext } from "react";
 import CommentReply from "./CommentReply";
 import Response from "./Response";
 
-type currentUser = {
+type CurrentUser = {
   image: {
     png: string;
     webp: string;
@@ -11,7 +11,7 @@ type currentUser = {
   username: string;
 };
 
-type comment = {
+type Comment = {
   id: number;
   content: string;
   createdAt: string;
@@ -23,10 +23,10 @@ type comment = {
     };
     username: string;
   };
-  replies: reply[];
+  replies: Reply[];
 };
 
-type reply = {
+type Reply = {
   id: number;
   content: string;
   createdAt: string;
@@ -42,27 +42,27 @@ type reply = {
 };
 
 type Action =
-  | { type: "SET_COMMENTS"; payload: comment[] }
-  | { type: "ADD_COMMENT"; payload: comment }
-  | { type: "EDIT_COMMENT"; payload: comment }
+  | { type: "SET_COMMENTS"; payload: Comment[] }
+  | { type: "ADD_COMMENT"; payload: Comment }
+  | { type: "EDIT_COMMENT"; payload: Comment }
   | {
       type: "EDIT_REPLY";
-      payload: { id: number; reply: reply };
+      payload: { id: number; reply: Reply };
     }
-  | { type: "DELETE_COMMENT"; payload: comment }
-  | { type: "DELETE_REPLY"; payload: { id: number; reply: reply } };
+  | { type: "DELETE_COMMENT"; payload: Comment }
+  | { type: "DELETE_REPLY"; payload: { id: number; reply: Reply } };
 
-type contextType = {
-  comments: comment[];
+type ContextType = {
+  comments: Comment[];
   dispatch: React.Dispatch<Action>;
 };
 
-export const UserContext = createContext<contextType | null>(null);
+export const UserContext = createContext<ContextType | null>(null);
 
 const Main = () => {
-  const [currentUser, setCurrentUser] = useState<currentUser>();
+  const [currentUser, setCurrentUser] = useState<CurrentUser>();
 
-  const reducer = (comments: comment[], action: Action): comment[] => {
+  const reducer = (comments: Comment[], action: Action): Comment[] => {
     switch (action.type) {
       case "SET_COMMENTS":
         return action.payload;
@@ -122,21 +122,8 @@ const Main = () => {
   };
   const [comments, dispatch] = useReducer(reducer, []);
 
-  // load initial user from data.json or localStorage
-  useEffect(() => {
-    console.log("😋 This is part of current user: ");
-
-    fetch("/data.json")
-      .then((response) => response.json())
-      .then((data: { currentUser: currentUser }) => {
-        setCurrentUser(data.currentUser);
-        console.log("💜 current user:  ", data.currentUser);
-      })
-      .catch((error) => console.error(error));
-  }, []);
-
   // set initialize comments from jsong file either from local or reducer
-  const setDispatchComments = (comments: comment[]) => {
+  const setDispatchComments = (comments: Comment[]) => {
     dispatch({
       type: "SET_COMMENTS",
       payload: comments,
@@ -153,7 +140,8 @@ const Main = () => {
     } else {
       fetch("/data.json")
         .then((response) => response.json())
-        .then((data: { comments: comment[] }) => {
+        .then((data: { currentUser: CurrentUser; comments: Comment[] }) => {
+          setCurrentUser(data.currentUser);
           setDispatchComments(data.comments);
           console.log("💎 comments:  ", data.comments);
           localStorage.setItem("comment", JSON.stringify(data.comments));
@@ -164,6 +152,7 @@ const Main = () => {
 
   useEffect(() => {
     if (!comments || comments.length === 0) return;
+
     const localOfVotes = localStorage.getItem("votes");
     if (!localOfVotes) {
       const voteList = comments.map((co) => {
