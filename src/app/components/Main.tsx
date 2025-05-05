@@ -89,7 +89,7 @@ const Main = () => {
       setDispatchComments(JSON.parse(localComments));
       // console.log("🐙 localComments: ", localComments);
     } else {
-      fetch("/data.json")
+      fetch("/data/data.json")
         .then((response) => response.json())
         .then((data: { currentUser: CurrentUser; comments: Comment[] }) => {
           setCurrentUser(data.currentUser);
