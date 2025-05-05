@@ -3,32 +3,10 @@ import Input from "./Input";
 import Button from "./Button";
 import Picture from "./Picture";
 import { UserContext } from "./Main";
-
-interface IcurrentUser {
-  image: {
-    png: string;
-    webp: string;
-  };
-  username: string;
-}
+import { CurrentUser, Reply } from "./Types";
 
 type ResponseProps = {
-  currentUser?: IcurrentUser;
-};
-
-type reply = {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  replyingTo: string;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
+  currentUser?: CurrentUser;
 };
 
 type voteReplies = {
@@ -70,7 +48,7 @@ const Response = ({ currentUser }: ResponseProps) => {
         },
         username: currentUser?.username,
       },
-      replies: [] as reply[],
+      replies: [] as Reply[],
     };
     context?.dispatch({ type: "ADD_COMMENT", payload: newComment });
     // clear the textarea after adding a comment

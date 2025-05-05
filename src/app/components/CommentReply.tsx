@@ -1,56 +1,21 @@
-import Comment from "./Comment";
-import Reply from "./Reply";
+import CommentView from "./CommentView";
+import ReplyView from "./ReplyView";
+import { Comment, CurrentUser } from "./Types";
 
-interface IcurrentUser {
-  image: {
-    png: string;
-    webp: string;
-  };
-  username: string;
-}
-
-interface Ireply {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  replyingTo: string;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-}
-interface Icomment {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-  replies: Ireply[];
-}
 
 type InteractiveComment = {
-  currentUser?: IcurrentUser;
-  comment: Icomment;
+  currentUser?: CurrentUser;
+  comment: Comment;
 };
 const CommentReply = ({ comment, currentUser }: InteractiveComment) => {
   // const useComent = useContext(UserContext);
 
   return (
     <div className="flex flex-col gap-4">
-      <Comment comment={comment} currentUser={currentUser} />
+      <CommentView comment={comment} currentUser={currentUser} />
       <div className="flex flex-col border-l border-grayish-blue/50 pl-4 gap-2">
         {comment.replies.map((reply, index) => (
-          <Reply
+          <ReplyView
             comment={comment}
             key={index}
             reply={reply}

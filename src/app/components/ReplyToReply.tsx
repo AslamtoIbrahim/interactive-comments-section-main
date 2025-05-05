@@ -3,52 +3,20 @@ import Input from "./Input";
 import Picture from "./Picture";
 import Button from "./Button";
 import { UserContext } from "./Main";
+import { Comment, CurrentUser, Reply } from "./Types";
 
-interface IcurrentUser {
-  image: {
-    png: string;
-    webp: string;
-  };
-  username: string;
-}
-
-interface Icomment {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-  replies: Ireply[];
-}
-
-interface Ireply {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  replyingTo: string;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-}
-
-type prop = {
-  currentUser?: IcurrentUser;
-  comment: Icomment;
-  reply: Ireply;
+type ReplyToReplyProps = {
+  currentUser?: CurrentUser;
+  comment: Comment;
+  reply: Reply;
   closeReplyBox: () => void;
 };
-const ReplyToReply = ({ currentUser, comment, reply, closeReplyBox }: prop) => {
+const ReplyToReply = ({
+  currentUser,
+  comment,
+  reply,
+  closeReplyBox,
+}: ReplyToReplyProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   let usernameToReply: string;
   const context = useContext(UserContext);
@@ -57,9 +25,6 @@ const ReplyToReply = ({ currentUser, comment, reply, closeReplyBox }: prop) => {
     usernameToReply = `@${reply.user.username} `;
     ref.current!.value = usernameToReply;
   }, []);
-
-
-  
 
   const setReply = () => {
     const replyText = ref.current!.value;
@@ -74,7 +39,7 @@ const ReplyToReply = ({ currentUser, comment, reply, closeReplyBox }: prop) => {
     // generate a new id for this new reply to the reply
     const newId = Math.max(0, ...comment.replies.map((c) => c.id)) + 1;
     // remove the usernameToReply from the text before adding it
-    const text = replyText.replace(usernameToReply, '');
+    const text = replyText.replace(usernameToReply, "");
     const newReply = {
       id: newId,
       content: text,

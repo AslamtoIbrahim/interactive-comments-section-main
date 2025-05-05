@@ -1,7 +1,7 @@
 "use client";
 import React, { useContext, useRef, useState, useEffect, useMemo } from "react";
 import ScoreButton from "./ScoreButton";
-import CurrentUser from "./CurrentUser";
+import CurrentUserView from "./CurrentUserView";
 import EditButton from "./EditButton";
 import DeleteButton from "./DeleteButton";
 import Picture from "./Picture";
@@ -12,44 +12,9 @@ import ReplyButton from "./ReplyButton";
 import tiemAgo from "./Functions";
 import { UserContext } from "./Main";
 import ReplyToReply from "./ReplyToReply";
+import { Comment, CurrentUser, Reply } from "./Types";
 
-interface IcurrentUser {
-  image: {
-    png: string;
-    webp: string;
-  };
-  username: string;
-}
 
-interface Icomment {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-  replies: Ireply[];
-}
-
-interface Ireply {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  replyingTo: string;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-}
 
 type voteReplies = {
   id: number;
@@ -62,13 +27,13 @@ type commentVotes = {
   voteReplies: voteReplies[];
 };
 
-type prop = {
-  comment?: Icomment;
-  reply?: Ireply;
-  currentUser?: IcurrentUser;
+type ReplyViewProps = {
+  comment?: Comment;
+  reply?: Reply;
+  currentUser?: CurrentUser;
 };
 
-const Reply = ({ comment, reply, currentUser }: prop) => {
+const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   const [editable, seteditable] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [isReply, setIsReply] = useState(false);
@@ -208,7 +173,7 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
             <p className="font-semibold text-sm md:text-lg text-dark-blue">
               {reply?.user.username}{" "}
             </p>
-            {currentUser?.username === reply?.user.username && <CurrentUser />}
+            {currentUser?.username === reply?.user.username && <CurrentUserView />}
             <p className="text-grayish-blue text-sm md:text-lg">
               {tiemAgo(reply!.createdAt)}
             </p>
@@ -264,4 +229,4 @@ const Reply = ({ comment, reply, currentUser }: prop) => {
   );
 };
 
-export default Reply;
+export default ReplyView;

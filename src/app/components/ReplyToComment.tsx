@@ -3,44 +3,7 @@ import { UserContext } from "./Main";
 import Input from "./Input";
 import Picture from "./Picture";
 import Button from "./Button";
-
-interface IcurrentUser {
-  image: {
-    png: string;
-    webp: string;
-  };
-  username: string;
-}
-
-interface Icomment {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-  replies: Ireply[];
-}
-
-interface Ireply {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  replyingTo: string;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-}
+import { CurrentUser, Comment } from "./Types";
 
 type voteReplies = {
   id: number;
@@ -53,19 +16,23 @@ type commentVotes = {
   voteReplies: voteReplies[];
 };
 
-
 type RplyBoxProps = {
-  comment: Icomment;
-  currentUser?: IcurrentUser;
+  comment: Comment;
+  currentUser?: CurrentUser;
   closeReplyBox: () => void;
 };
 
-const ReplyToComment = ({ currentUser, comment, closeReplyBox }: RplyBoxProps) => {
+const ReplyToComment = ({
+  currentUser,
+  comment,
+  closeReplyBox,
+}: RplyBoxProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const context = useContext(UserContext);
 
   const atusername = `@${comment.user.username} `;
+  
 
   useEffect(() => {
     //  add @ and username of the replyingTo in textarea
@@ -81,28 +48,28 @@ const ReplyToComment = ({ currentUser, comment, closeReplyBox }: RplyBoxProps) =
     }
 
     // get new id for new reply
-    const nexId = Math.max(0, ...comment.replies.map(re => re.id)) + 1;
+    const nexId = Math.max(0, ...comment.replies.map((re) => re.id)) + 1;
     const newReply = {
-        id: nexId,
-        content: replyText.replace(atusername, ''),
-        createdAt: new Date().toISOString(),
-        score: 0,
-        replyingTo: comment.user.username,
-        user: {
-          image: {
-            png: currentUser?.image.png as string,
-            webp: currentUser?.image.webp as string,
-          },
-          username: currentUser?.username as string,
-        }
-      }
+      id: nexId,
+      content: replyText.replace(atusername, ""),
+      createdAt: new Date().toISOString(),
+      score: 0,
+      replyingTo: comment.user.username,
+      user: {
+        image: {
+          png: currentUser?.image.png as string,
+          webp: currentUser?.image.webp as string,
+        },
+        username: currentUser?.username as string,
+      },
+    };
 
     const updatedComment = {
-        id: comment.id,
-        replies: [...comment.replies, newReply],
-    }
-    context?.dispatch({type:'EDIT_COMMENT', payload: updatedComment})
-    ref.current!.value = ''
+      id: comment.id,
+      replies: [...comment.replies, newReply],
+    };
+    context?.dispatch({ type: "EDIT_COMMENT", payload: updatedComment });
+    ref.current!.value = "";
     closeReplyBox();
     // add a new vote for this new reply in the camment
     addNewVote(nexId);
@@ -118,9 +85,11 @@ const ReplyToComment = ({ currentUser, comment, closeReplyBox }: RplyBoxProps) =
       };
       const newObjectVote = {
         id: comment.id,
-        voteReplies: replyVote
-      }
-      const newListVote = listVotes.map(cv => cv.id === comment.id ? {...cv, ...newObjectVote} : cv);
+        voteReplies: replyVote,
+      };
+      const newListVote = listVotes.map((cv) =>
+        cv.id === comment.id ? { ...cv, ...newObjectVote } : cv
+      );
       localStorage.setItem("votes", JSON.stringify(newListVote));
     }
   };

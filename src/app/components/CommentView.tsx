@@ -1,7 +1,7 @@
 "use client";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import ScoreButton from "./ScoreButton";
-import CurrentUser from "./CurrentUser";
+import CurrentUserView from "./CurrentUserView";
 import EditButton from "./EditButton";
 import DeleteButton from "./DeleteButton";
 import Picture from "./Picture";
@@ -12,43 +12,7 @@ import ReplyButton from "./ReplyButton";
 import { UserContext } from "./Main";
 import tiemAgo from "./Functions";
 import ReplyToComment from "./ReplyToComment";
-
-interface IcurrentUser {
-  image: {
-    png: string;
-    webp: string;
-  };
-  username: string;
-}
-
-interface Ireply {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  replyingTo: string;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-}
-interface Icomment {
-  id: number;
-  content: string;
-  createdAt: string;
-  score: number;
-  user: {
-    image: {
-      png: string;
-      webp: string;
-    };
-    username: string;
-  };
-  replies: Ireply[];
-}
+import { Comment, CurrentUser } from "./Types";
 
 type voteReplies = {
   id: number;
@@ -61,11 +25,11 @@ type commentVotes = {
   voteReplies: voteReplies[];
 };
 
-type prop = {
-  comment?: Icomment;
-  currentUser?: IcurrentUser;
+type CommentViewProps = {
+  comment?: Comment;
+  currentUser?: CurrentUser;
 };
-const Comment = ({ comment, currentUser }: prop) => {
+const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   const [isCommentEditVisible, setIsCommentEditVisible] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isReplyVisible, setIsReplyVisible] = useState(false);
@@ -172,7 +136,7 @@ const Comment = ({ comment, currentUser }: prop) => {
               {comment?.user.username}
             </p>
             {currentUser?.username === comment?.user.username && (
-              <CurrentUser />
+              <CurrentUserView />
             )}
             <p className="text-grayish-blue text-sm md:text-lg">
               {tiemAgo(comment!.createdAt)}
@@ -224,4 +188,4 @@ const Comment = ({ comment, currentUser }: prop) => {
   );
 };
 
-export default Comment;
+export default CommentView;
