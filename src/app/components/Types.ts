@@ -1,3 +1,6 @@
+export const LOCAL_COMMENT_KEY = "DATA_COMMENT";
+export const LOCAL_CURRENTUSER_KEY = "DATA_CURRENTUSER";
+
 export type CurrentUser = {
   image: {
     png: string;
@@ -7,7 +10,7 @@ export type CurrentUser = {
 };
 
 export type Comment = {
-  id: number;
+  id: string;
   content: string;
   createdAt: string;
   score: number;
@@ -22,7 +25,7 @@ export type Comment = {
 };
 
 export type Reply = {
-  id: number;
+  id: string;
   content: string;
   createdAt: string;
   score: number;
@@ -36,20 +39,59 @@ export type Reply = {
   };
 };
 
+type EditedScore = {
+  id: string;
+  score: number;
+};
+
+type AddedReply = {
+  id: string;
+  replies: Reply[];
+};
+
+export type UpdatedCommontContent = {
+  id: string;
+  content: string;
+  createdAt: string;
+};
+
+export type UpdatedReplyContent = {
+  id: string;
+  content: string;
+  createdAt: string;
+};
+
+type UpdatedScoreReply = {
+  id: string;
+  score: number;
+};
+
+export type UpdatedReply = UpdatedReplyContent | UpdatedScoreReply;
+
+export type UpdatedComment = UpdatedCommontContent | EditedScore | AddedReply;
+
 export type ContextType = {
   comments: Comment[];
-  dispatch: React.Dispatch<Action>;
+  addAllComments: (comments: Comment[]) => void;
+  addComment: (comment: Comment) => void;
+  updateComment: (comment: UpdatedComment) => void;
+  updateReply: (id: string, reply: UpdatedReply) => void;
+  deleteComment: (id: string) => void;
+  deleteReply: (id: string, nestedId: string) => void;
 };
 
 export type Action =
   | { type: "SET_COMMENTS"; payload: Comment[] }
   | { type: "ADD_COMMENT"; payload: Comment }
-  | { type: "EDIT_COMMENT"; payload: Comment }
+  | {
+      type: "EDIT_COMMENT";
+      payload: UpdatedComment;
+    }
   | {
       type: "EDIT_REPLY";
-      payload: { id: number; reply: Reply };
+      payload: { id: string; reply: UpdatedReply };
     }
-  | { type: "DELETE_COMMENT"; payload: Comment }
-  | { type: "DELETE_REPLY"; payload: { id: number; reply: Reply } };
+  | { type: "DELETE_COMMENT"; payload: { id: string } }
+  | { type: "DELETE_REPLY"; payload: { id: string; nestedId: string } };
 
  

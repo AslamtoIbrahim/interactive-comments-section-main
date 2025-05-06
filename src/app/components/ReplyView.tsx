@@ -10,26 +10,24 @@ import Button from "./Button";
 import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 import tiemAgo from "./Functions";
-import { UserContext } from "./Main";
 import ReplyToReply from "./ReplyToReply";
 import { Comment, CurrentUser, Reply } from "./Types";
-
-
+import InstractiveContext from "../Store/CreateContext";
 
 type voteReplies = {
-  id: number;
+  id: string;
   vote: string;
 };
 
 type commentVotes = {
-  id: number;
+  id: string;
   vote: string;
   voteReplies: voteReplies[];
 };
 
 type ReplyViewProps = {
-  comment?: Comment;
-  reply?: Reply;
+  comment: Comment;
+  reply: Reply;
   currentUser?: CurrentUser;
 };
 
@@ -38,7 +36,8 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   const [dialog, setDialog] = useState(false);
   const [isReply, setIsReply] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
-  const contextRely = useContext(UserContext);
+  const dataContext = useContext(InstractiveContext);
+
   // const votingRef = useRef<string>("");
   const voteReplyValue = useMemo(() => {
     const localVotes = localStorage.getItem("votes");
@@ -63,15 +62,10 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   };
   const handleDelete = () => {
     // delete comment logic here
-    const repl = {
-      id: reply?.id,
-    };
-
-    const comRepl = {
-      id: comment?.id,
-      reply: repl,
-    };
-    contextRely?.dispatch({ type: "DELETE_REPLY", payload: comRepl });
+     
+    // contextRely?.dispatch({ type: "DELETE_REPLY", payload: comRepl });
+    //  delete a reply by sending it to dispatch function
+    dataContext.deleteReply(comment?.id, reply?.id);
     setDialog(false);
   };
 
@@ -106,17 +100,16 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
     console.log("🎃 replyingto: ", reply?.replyingTo);
     // delete @username from the content before adding it
     const text = editinput.replace(`@${reply?.replyingTo} `, "");
-    const rep = {
+    const editedReply = {
       id: reply?.id,
       content: text,
       createdAt: new Date().toISOString(),
     };
-    const editReply = {
-      id: comment?.id,
-      reply: rep,
-    };
+    
 
-    contextRely?.dispatch({ type: "EDIT_REPLY", payload: editReply });
+    // contextRely?.dispatch({ type: "EDIT_REPLY", payload: editReply });
+    //  update the reply by sending it to dispatch function
+    dataContext.updateReply(comment?.id, editedReply)
     ref.current!.value = "";
     seteditable(!editable);
   };
@@ -131,15 +124,15 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
         vote: vote,
       };
       const listOfVotes: commentVotes[] = JSON.parse(localVote);
-      const newListOfVotes = listOfVotes.map((cv) =>
-        cv.id === comment?.id
+      const newListOfVotes = listOfVotes.map((commentVote) =>
+        commentVote.id === comment?.id
           ? {
-              ...cv,
-              voteReplies: cv.voteReplies.map((rv) =>
+              ...commentVote,
+              voteReplies: commentVote.voteReplies.map((rv) =>
                 rv.id === reply?.id ? { ...rv, ...newVoteForReply } : rv
               ),
             }
-          : cv
+          : commentVote
       );
       console.log("newListOfVotes 🧡 ", newListOfVotes);
       console.log("vote::::> ", vote);
@@ -152,16 +145,16 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
     if (reply?.user.username === currentUser?.username) return;
 
     if (!score) return;
+
     const scoreReply = {
       id: reply?.id,
       score: score,
     };
 
-    const scoreComent = {
-      id: comment?.id,
-      reply: scoreReply,
-    };
-    contextRely?.dispatch({ type: "EDIT_REPLY", payload: scoreComent });
+     
+    // contextRely?.dispatch({ type: "EDIT_REPLY", payload: scoreComent });
+    // update score of the reply by sending it to dispatch
+    dataContext.updateReply(comment?.id, scoreReply)
   };
 
   return (
@@ -173,7 +166,9 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
             <p className="font-semibold text-sm md:text-lg text-dark-blue">
               {reply?.user.username}{" "}
             </p>
-            {currentUser?.username === reply?.user.username && <CurrentUserView />}
+            {currentUser?.username === reply?.user.username && (
+              <CurrentUserView />
+            )}
             <p className="text-grayish-blue text-sm md:text-lg">
               {tiemAgo(reply!.createdAt)}
             </p>

@@ -9,32 +9,33 @@ import Input from "./Input";
 import Button from "./Button";
 import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
-import { UserContext } from "./Main";
 import tiemAgo from "./Functions";
 import ReplyToComment from "./ReplyToComment";
 import { Comment, CurrentUser } from "./Types";
+import InstractiveContext from "../Store/CreateContext";
 
 type voteReplies = {
-  id: number;
+  id: string;
   vote: string;
 };
 
 type commentVotes = {
-  id: number;
+  id: string;
   vote: string;
   voteReplies: voteReplies[];
 };
 
 type CommentViewProps = {
-  comment?: Comment;
-  currentUser?: CurrentUser;
+  comment: Comment;
+  currentUser: CurrentUser;
 };
 const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   const [isCommentEditVisible, setIsCommentEditVisible] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isReplyVisible, setIsReplyVisible] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
-  const commentContext = useContext(UserContext);
+  const dataContext = useContext(InstractiveContext);
+
   const voteValue = useMemo(() => {
     const votes = localStorage.getItem("votes");
     if (votes) {
@@ -58,13 +59,10 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   const showAndHideDialog = () => {
     setIsDialogVisible(!isDialogVisible);
   };
-  const deleteComment = () => {
-    const targetComment = { id: comment?.id };
-    commentContext?.dispatch({
-      type: "DELETE_COMMENT",
-      payload: targetComment,
-    });
 
+  const deleteComment = () => {
+    // delete a comment by sending id to dispatch function
+    dataContext.deleteComment(comment?.id);
     setIsDialogVisible(false);
   };
 
@@ -78,8 +76,8 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
       content: commentEdit,
       createdAt: new Date().toISOString(),
     };
-
-    commentContext?.dispatch({ type: "EDIT_COMMENT", payload: editedComment });
+    // update a comment by sending a new comment to dispatch function
+    dataContext.updateComment(editedComment);
     ref.current!.value = "";
     setIsCommentEditVisible(false);
   };
@@ -120,7 +118,9 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
       id: comment?.id,
       score: score,
     };
-    commentContext?.dispatch({ type: "EDIT_COMMENT", payload: updatedScore });
+    // update the score of a comment by sending a new score to dispatch function
+    // commentContext?.dispatch({ type: "EDIT_COMMENT", payload: updatedScore });
+    dataContext.updateComment(updatedScore);
   };
 
   return (

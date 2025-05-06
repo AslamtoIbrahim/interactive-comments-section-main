@@ -1,16 +1,22 @@
-import React, { ForwardedRef, useState } from "react";
+import React, { ForwardedRef, useRef, useState } from "react";
 
-interface InputValue {
+interface InputValueProp {
   text?: string;
 }
+
+
 const InputInner = (
-  { text }: InputValue,
+  { text }: InputValueProp,
   ref: ForwardedRef<HTMLTextAreaElement>
 ) => {
-  const [textValue, setTextValue] = useState(text);
+  
+
+  const [textValue, setTextValue] = useState(text || "");
+
   const handleOnchneg = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextValue(e.target.value);
   };
+
   return (
     <div>
       <textarea
@@ -28,3 +34,6 @@ const InputInner = (
 const Input = React.forwardRef(InputInner);
 
 export default Input;
+
+
+ 

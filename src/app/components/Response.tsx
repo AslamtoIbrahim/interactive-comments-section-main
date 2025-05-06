@@ -2,11 +2,11 @@ import React, { useContext, useRef } from "react";
 import Input from "./Input";
 import Button from "./Button";
 import Picture from "./Picture";
-import { UserContext } from "./Main";
 import { CurrentUser, Reply } from "./Types";
+import InstractiveContext from "../Store/CreateContext";
 
 type ResponseProps = {
-  currentUser?: CurrentUser;
+  currentUser: CurrentUser;
 };
 
 type voteReplies = {
@@ -23,7 +23,7 @@ type commentVotes = {
 const Response = ({ currentUser }: ResponseProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
-  const context = useContext(UserContext);
+  const dataContext = useContext(InstractiveContext);
 
   // add comment to data
   const sendClick = () => {
@@ -34,7 +34,7 @@ const Response = ({ currentUser }: ResponseProps) => {
     }
 
     // get the last id and add to it one so it add new id
-    const nexId = Math.max(0, ...context!.comments.map((c) => c.id)) + 1;
+    const nexId = crypto.randomUUID();
 
     const newComment = {
       id: nexId,
@@ -50,14 +50,16 @@ const Response = ({ currentUser }: ResponseProps) => {
       },
       replies: [] as Reply[],
     };
-    context?.dispatch({ type: "ADD_COMMENT", payload: newComment });
+    // add a new comment by sending it dispatch function
+    dataContext.addComment(newComment);
+
     // clear the textarea after adding a comment
     ref.current!.value = "";
     // add a new vote for this new comment
-    addNewVote(nexId);
+    // addNewVote(nexId);
   };
 
-  const addNewVote = (id: number) => {
+  const addNewVote = (id: string) => {
     const localVotes = localStorage.getItem("votes");
     if (localVotes) {
       const listVotes: commentVotes[] = JSON.parse(localVotes);

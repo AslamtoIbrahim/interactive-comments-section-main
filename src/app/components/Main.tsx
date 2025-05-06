@@ -1,134 +1,100 @@
 "use client";
-import React, { useEffect, useReducer, useState, createContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import CommentReply from "./CommentReply";
 import Response from "./Response";
-import { CurrentUser, Comment, ContextType, Action } from "./Types";
-
-
-
-
-
-export const UserContext = createContext<ContextType | null>(null);
+import {
+  CurrentUser,
+  Comment,
+  LOCAL_COMMENT_KEY,
+  LOCAL_CURRENTUSER_KEY,
+} from "./Types";
+import InstractiveContext from "../Store/CreateContext";
 
 const Main = () => {
+  // const defaultUser = {
+  //   image: {
+  //     png: "",
+  //     webp: "",
+  //   },
+  //   username: "",
+  // };
   const [currentUser, setCurrentUser] = useState<CurrentUser>();
-
-  const reducer = (comments: Comment[], action: Action): Comment[] => {
-    switch (action.type) {
-      case "SET_COMMENTS":
-        return action.payload;
-      case "ADD_COMMENT": {
-        const newComment = [...comments, action.payload];
-        localStorage.setItem("comment", JSON.stringify(newComment));
-        return newComment;
-      }
-      case "EDIT_COMMENT": {
-        const editedCom = comments.map((com) =>
-          com.id === action.payload.id ? { ...com, ...action.payload } : com
-        );
-        localStorage.setItem("comment", JSON.stringify(editedCom));
-        return editedCom;
-      }
-      case "EDIT_REPLY": {
-        const editedReply = comments.map((com) => {
-          if (com.id === action.payload.id) {
-            return {
-              ...com,
-              replies: com.replies.map((rep) =>
-                rep.id === action.payload.reply.id
-                  ? { ...rep, ...action.payload.reply }
-                  : rep
-              ),
-            };
-          }
-          return com;
-        });
-        localStorage.setItem("comment", JSON.stringify(editedReply));
-        return editedReply;
-      }
-      case "DELETE_COMMENT": {
-        const deletedCom = comments.filter(
-          (com) => com.id !== action.payload.id
-        );
-        localStorage.setItem("comment", JSON.stringify(deletedCom));
-        return deletedCom;
-      }
-      case "DELETE_REPLY": {
-        const deleteRep = comments.map((com) =>
-          com.id === action.payload.id
-            ? {
-                ...com,
-                replies: com.replies.filter(
-                  (rep) => rep.id !== action.payload.reply.id
-                ),
-              }
-            : com
-        );
-        localStorage.setItem("comment", JSON.stringify(deleteRep));
-        return deleteRep;
-      }
-      default:
-        return comments;
-    }
-  };
-  const [comments, dispatch] = useReducer(reducer, []);
+  const dataContext = useContext(InstractiveContext);
 
   // set initialize comments from jsong file either from local or reducer
-  const setDispatchComments = (comments: Comment[]) => {
-    dispatch({
-      type: "SET_COMMENTS",
-      payload: comments,
-    });
+  const setAllComents = (comments: Comment[]) => {
+    console.log("setAllComents: 🚖", comments);
+    dataContext.addAllComments(comments);
   };
   // load initial comments from data.json or localStorage
   useEffect(() => {
     console.log("😋 This is part of comments: ");
     // localStorage.clear()
-    const localComments = localStorage.getItem("comment");
-    if (localComments) {
-      setDispatchComments(JSON.parse(localComments));
-      // console.log("🐙 localComments: ", localComments);
+    const localComent = localStorage.getItem(LOCAL_COMMENT_KEY);
+    const localCurrentUser = localStorage.getItem(LOCAL_CURRENTUSER_KEY);
+    if (localComent && localCurrentUser) {
+      const dataUser: CurrentUser = JSON.parse(localCurrentUser);
+      console.log("🎃 data: ", dataUser);
+      setCurrentUser(dataUser);
+      const dataComment: Comment[] = JSON.parse(localComent);
+      console.log("✅ After setCurrentUser: ", currentUser);
+      setAllComents(dataComment);
     } else {
       fetch("/data/data.json")
         .then((response) => response.json())
         .then((data: { currentUser: CurrentUser; comments: Comment[] }) => {
           setCurrentUser(data.currentUser);
-          setDispatchComments(data.comments);
+          setAllComents(data.comments);
           console.log("💎 comments:  ", data.comments);
-          localStorage.setItem("comment", JSON.stringify(data.comments));
+          console.log("🌌🪐 currentUser:  ", data.currentUser);
+          localStorage.setItem(
+            LOCAL_COMMENT_KEY,
+            JSON.stringify(data.comments)
+          );
+          localStorage.setItem(
+            LOCAL_CURRENTUSER_KEY,
+            JSON.stringify(data.currentUser)
+          );
         })
         .catch((error) => console.error(error));
     }
   }, []);
 
   useEffect(() => {
-    if (!comments || comments.length === 0) return;
+    if (!dataContext.comments || dataContext.comments.length === 0) return;
 
     const localOfVotes = localStorage.getItem("votes");
     if (!localOfVotes) {
-      const voteList = comments.map((co) => {
+      const voteList = dataContext.comments.map((comment) => {
         return {
-          id: co.id,
+          id: comment.id,
           vote: "",
-          voteReplies: co.replies.map((re) => {
-            return { id: re.id, vote: "" };
+          voteReplies: comment.replies.map((reply) => {
+            return { id: reply.id, vote: "" };
           }),
         };
       });
-      console.log("list of votes 🌄 ☔ ", voteList);
-      localStorage.setItem("votes", JSON.stringify(voteList));
+      // console.log("list of votes 🌄 ☔ ", voteList);
+      // localStorage.setItem("votes", JSON.stringify(voteList));
     }
-  }, [comments]);
+  }, [dataContext.comments]);
 
   return (
-    <div className="relative bg-very-light-gray h-fill  py-6 px-4 flex flex-col gap-2">
-      <UserContext.Provider value={{ comments, dispatch }}>
-        {comments.map((comm, ind) => (
-          <CommentReply currentUser={currentUser} comment={comm} key={ind} />
-        ))}
-
-        <Response currentUser={currentUser} />
-      </UserContext.Provider>
+    <div className="relative h-fill py-6 px-4 flex flex-col gap-2">
+      {dataContext.comments && currentUser ? (
+        <>
+          {dataContext.comments.map((comment) => (
+            <CommentReply
+              currentUser={currentUser}
+              comment={comment}
+              key={comment.id}
+            />
+          ))}
+          <Response currentUser={currentUser} />
+        </>
+      ) : (
+        <p>wait ...</p>
+      )}
     </div>
   );
 };

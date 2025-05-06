@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 
 interface ButtonProps {
   voting: string;
-  score?: number;
+  score: number;
   setOnVoteListener?: (vote: string) => void;
   setOnScoreListener?: (score: number) => void;
 }
@@ -14,7 +14,7 @@ const ScoreButton = ({
   setOnVoteListener,
   setOnScoreListener,
 }: ButtonProps) => {
-  const [scores, setScores] = useState(score ?? 0);
+  const [scores, setScores] = useState(score);
   const votes = useRef<string>(voting);
   console.log("votes 🌐:   ", votes.current);
 

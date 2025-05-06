@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { UserContext } from "./Main";
 import Input from "./Input";
 import Picture from "./Picture";
 import Button from "./Button";
 import { CurrentUser, Comment } from "./Types";
+import InstractiveContext from "../Store/CreateContext";
 
 type voteReplies = {
-  id: number;
+  id: string;
   vote: string;
 };
 
 type commentVotes = {
-  id: number;
+  id: string;
   vote: string;
   voteReplies: voteReplies[];
 };
@@ -29,10 +29,9 @@ const ReplyToComment = ({
 }: RplyBoxProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
-  const context = useContext(UserContext);
+  const dataContext = useContext(InstractiveContext);
 
   const atusername = `@${comment.user.username} `;
-  
 
   useEffect(() => {
     //  add @ and username of the replyingTo in textarea
@@ -48,9 +47,9 @@ const ReplyToComment = ({
     }
 
     // get new id for new reply
-    const nexId = Math.max(0, ...comment.replies.map((re) => re.id)) + 1;
+    const newId = crypto.randomUUID();
     const newReply = {
-      id: nexId,
+      id: newId,
       content: replyText.replace(atusername, ""),
       createdAt: new Date().toISOString(),
       score: 0,
@@ -64,18 +63,20 @@ const ReplyToComment = ({
       },
     };
 
-    const updatedComment = {
+    const existedComment = {
       id: comment.id,
       replies: [...comment.replies, newReply],
     };
-    context?.dispatch({ type: "EDIT_COMMENT", payload: updatedComment });
+    // send a comment with new edited reply to dispatch function
+    dataContext.updateComment(existedComment);
+
     ref.current!.value = "";
     closeReplyBox();
     // add a new vote for this new reply in the camment
-    addNewVote(nexId);
+    addNewVote(newId);
   };
 
-  const addNewVote = (id: number) => {
+  const addNewVote = (id: string) => {
     const localVotes = localStorage.getItem("votes");
     if (localVotes) {
       const listVotes: commentVotes[] = JSON.parse(localVotes);
