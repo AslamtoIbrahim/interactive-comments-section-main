@@ -1,25 +1,38 @@
-'use client'
+"use client";
 import React, { useReducer } from "react";
 import InstractiveContext from "./CreateContext";
-import { Comment, Action, UpdatedComment, UpdatedReply, LOCAL_COMMENT_KEY } from "../components/Types";
+import {
+  Comment,
+  Action,
+  UpdatedComment,
+  UpdatedReply,
+  LOCAL_COMMENT_KEY,
+} from "../components/Types";
 
 const defaultCommentsState: Comment[] = [];
 
+const saveToLoacal = (data: Comment[]) => {
+  localStorage.setItem(LOCAL_COMMENT_KEY, JSON.stringify(data));
+};
+
 const commentReducer = (comments: Comment[], action: Action): Comment[] => {
-  console.log('commentReducer 🏛', comments);
+  console.log("commentReducer 🏛", comments);
   switch (action.type) {
     case "SET_COMMENTS":
       return action.payload;
     case "ADD_COMMENT": {
       const newComment = [...comments, action.payload];
-      localStorage.setItem(LOCAL_COMMENT_KEY, JSON.stringify(newComment));
+      saveToLoacal(newComment);
       return newComment;
     }
     case "EDIT_COMMENT": {
       const editedCom = comments.map((comment) =>
-        comment.id === action.payload.id ? { ...comment, ...action.payload } : comment
+        comment.id === action.payload.id
+          ? { ...comment, ...action.payload }
+          : comment
       );
-      localStorage.setItem(LOCAL_COMMENT_KEY, JSON.stringify(editedCom));
+      saveToLoacal(editedCom);
+
       return editedCom;
     }
     case "EDIT_REPLY": {
@@ -36,12 +49,14 @@ const commentReducer = (comments: Comment[], action: Action): Comment[] => {
         }
         return comment;
       });
-      localStorage.setItem(LOCAL_COMMENT_KEY, JSON.stringify(editedReply));
+      saveToLoacal(editedReply);
       return editedReply;
     }
     case "DELETE_COMMENT": {
-      const deletedComment = comments.filter((comment) => comment.id !== action.payload.id);
-      localStorage.setItem(LOCAL_COMMENT_KEY, JSON.stringify(deletedComment));
+      const deletedComment = comments.filter(
+        (comment) => comment.id !== action.payload.id
+      );
+      saveToLoacal(deletedComment);
       return deletedComment;
     }
     case "DELETE_REPLY": {
@@ -55,7 +70,7 @@ const commentReducer = (comments: Comment[], action: Action): Comment[] => {
             }
           : comment
       );
-      localStorage.setItem(LOCAL_COMMENT_KEY, JSON.stringify(deletedReply));
+      saveToLoacal(deletedReply);
       return deletedReply;
     }
     default:
@@ -70,7 +85,7 @@ const IntractiveComment = (props: { children: React.ReactNode }) => {
   );
 
   const addAllCommentsHandler = (comments: Comment[]) => {
-    console.log('comments: 🏫', comments)
+    console.log("comments: 🏫", comments);
     dispatchComment({ type: "SET_COMMENTS", payload: comments });
   };
   const addCommentHandler = (comment: Comment) => {
@@ -83,10 +98,10 @@ const IntractiveComment = (props: { children: React.ReactNode }) => {
     dispatchComment({ type: "EDIT_REPLY", payload: { id, reply } });
   };
   const deleteCommentHandler = (id: string) => {
-    dispatchComment({type: 'DELETE_COMMENT', payload: {id}})
+    dispatchComment({ type: "DELETE_COMMENT", payload: { id } });
   };
   const deleteReplyHandler = (id: string, nestedId: string) => {
-    dispatchComment({type: 'DELETE_REPLY', payload:{id, nestedId}})
+    dispatchComment({ type: "DELETE_REPLY", payload: { id, nestedId } });
   };
   const data = {
     comments: commentsState,
