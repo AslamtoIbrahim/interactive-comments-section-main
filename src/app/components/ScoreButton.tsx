@@ -2,46 +2,56 @@
 import React, { useRef, useState } from "react";
 
 interface ButtonProps {
+  canIvote: boolean;
   voting: string;
   score: number;
-  setOnVoteListener?: (vote: string) => void;
-  setOnScoreListener?: (score: number) => void;
+  // setOnVoteListener?: (vote: string) => void;
+  setOnScoreListener?: (score: number, vote: string) => void;
 }
 
 const ScoreButton = ({
+  canIvote,
   voting,
   score,
-  setOnVoteListener,
+  // setOnVoteListener,
   setOnScoreListener,
 }: ButtonProps) => {
   const [scores, setScores] = useState(score);
   const votes = useRef<string>(voting);
   console.log("votes 🌐:   ", votes.current);
+  console.log('voteReplyValue 😍', voting)
+
 
   const handleIncrement = () => {
+    if (canIvote) return;
+
     console.log("befor testing voests 🔵  ", votes.current);
     if (votes.current === "up") return;
 
     console.log("votes ✅  ", votes.current);
     const newVote = votes.current === "" ? "up" : "";
     votes.current = newVote;
-    setOnVoteListener?.(newVote);
+    // setOnVoteListener?.(newVote);
 
     const newScore = scores + 1;
     setScores(newScore);
-    setOnScoreListener?.(newScore);
+
+    setOnScoreListener?.(newScore, newVote);
   };
 
   const handleDecrement = () => {
+    if (canIvote) return;
+
     if (votes.current === "down") return;
 
     const newVote = votes.current === "" ? "down" : "";
     votes.current = newVote;
-    setOnVoteListener?.(newVote);
+    // setOnVoteListener?.(newVote);
 
     const newScore = scores - 1;
     setScores(newScore);
-    setOnScoreListener?.(newScore);
+
+    setOnScoreListener?.(newScore, newVote);
   };
   return (
     <div className="bg-very-light-gray text-moderate-blue/55  w-fit font-rubik font-medium  md:text-lg py-1 px-3 md:px-4 rounded-lg flex md:flex-col items-center   gap-4 md:gap-2  ">

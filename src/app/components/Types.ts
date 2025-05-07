@@ -14,6 +14,7 @@ export type Comment = {
   content: string;
   createdAt: string;
   score: number;
+  voters: Voters[];
   user: {
     image: {
       png: string;
@@ -29,6 +30,7 @@ export type Reply = {
   content: string;
   createdAt: string;
   score: number;
+  voters: Voters[];
   replyingTo: string;
   user: {
     image: {
@@ -42,6 +44,7 @@ export type Reply = {
 type EditedScore = {
   id: string;
   score: number;
+  voters: Voters[];
 };
 
 type AddedReply = {
@@ -94,4 +97,7 @@ export type Action =
   | { type: "DELETE_COMMENT"; payload: { id: string } }
   | { type: "DELETE_REPLY"; payload: { id: string; nestedId: string } };
 
- 
+export type Voters = {
+  username: string;
+  voteType: string;
+};

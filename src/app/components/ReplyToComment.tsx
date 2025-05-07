@@ -53,6 +53,7 @@ const ReplyToComment = ({
       content: replyText.replace(atusername, ""),
       createdAt: new Date().toISOString(),
       score: 0,
+      voters: [],
       replyingTo: comment.user.username,
       user: {
         image: {

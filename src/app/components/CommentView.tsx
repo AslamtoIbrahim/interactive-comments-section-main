@@ -11,8 +11,9 @@ import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 import tiemAgo from "./Functions";
 import ReplyToComment from "./ReplyToComment";
-import { Comment, CurrentUser } from "./Types";
+import { Comment, CurrentUser, Voters } from "./Types";
 import InstractiveContext from "../Store/CreateContext";
+import EditTextView from "./EditTextView";
 
 type voteReplies = {
   id: string;
@@ -33,17 +34,16 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   const [isCommentEditVisible, setIsCommentEditVisible] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isReplyVisible, setIsReplyVisible] = useState(false);
-  const ref = useRef<HTMLTextAreaElement>(null);
+  // const ref = useRef<HTMLTextAreaElement>(null);
+  const ref = useRef(comment.content);
   const dataContext = useContext(InstractiveContext);
 
   const voteValue = useMemo(() => {
-    const votes = localStorage.getItem("votes");
-    if (votes) {
-      const listvotes: commentVotes[] = JSON.parse(votes);
-      return listvotes.find((vo) => vo.id === comment?.id)?.vote ?? "";
-    }
-    return "";
-  }, [comment?.id]);
+    return (
+      comment?.voters.find((voter) => voter.username === currentUser.username)
+        ?.voteType ?? ""
+    );
+  }, [comment?.voters]);
 
   useEffect(() => {
     if (isDialogVisible) {
@@ -53,9 +53,12 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     }
   }, [isDialogVisible]);
 
+  // 🖊 Edit button
   const onButtonEditClick = () => {
     setIsCommentEditVisible(!isCommentEditVisible);
   };
+
+  // 🗑 Delete button
   const showAndHideDialog = () => {
     setIsDialogVisible(!isDialogVisible);
   };
@@ -67,7 +70,8 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   };
 
   const updateComment = () => {
-    const commentEdit = ref.current!.value;
+    // const commentEdit = ref.current!.value;
+    const commentEdit = ref.current;
     if (commentEdit === "") {
       return;
     }
@@ -78,7 +82,8 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     };
     // update a comment by sending a new comment to dispatch function
     dataContext.updateComment(editedComment);
-    ref.current!.value = "";
+    // ref.current!.value = "";
+    ref.current = "";
     setIsCommentEditVisible(false);
   };
 
@@ -87,40 +92,61 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     console.log("🧼 outside: ");
   };
 
-  const onVoteClick = (votes: string) => {
-    if (comment?.user.username === currentUser?.username) return;
+  // const onVoteClick = (votes: string) => {
+  //   if (comment?.user.username === currentUser?.username) return;
 
-    // localStorage.removeItem("votes");
-    console.log("votes 🎫 : ", votes);
+  //   // add a new vote if there is none for this comment
 
-    // add a new vote if there is none for this comment
-    const localVotes = localStorage.getItem("votes");
-    if (localVotes) {
-      const newVote = {
-        id: comment?.id,
-        vote: votes,
-      };
-      const list: commentVotes[] = JSON.parse(localVotes);
-      const newVoteList = list.map((vo) =>
-        vo.id === comment?.id ? { ...vo, ...newVote } : vo
-      );
-      localStorage.setItem("votes", JSON.stringify(newVoteList));
-    }
+  // };
 
-    console.log("localStorage Votes :🎑:  ", localStorage.getItem("votes"));
-  };
-
-  const onScoreClick = (score: number) => {
+  // gets score value from the button
+  const onScoreClick = (score: number, votes: string) => {
     if (comment?.user.username === currentUser?.username) return;
 
     if (!score) return;
+
+    console.log("score , votes 🎫 : ", score, votes);
+    const voters = voteArrayHandl(votes);
     const updatedScore = {
       id: comment?.id,
       score: score,
+      voters: voters,
     };
     // update the score of a comment by sending a new score to dispatch function
-    // commentContext?.dispatch({ type: "EDIT_COMMENT", payload: updatedScore });
     dataContext.updateComment(updatedScore);
+  };
+
+  const voteArrayHandl = (vote: string): Voters[] => {
+    const found = comment.voters.find(
+      (voter) => voter.username === currentUser.username
+    );
+    if (found) {
+      if (vote === "") {
+        // delete code goes here
+        return comment.voters.filter(
+          (voter) => voter.username !== currentUser.username
+        );
+      } else {
+        // update code goes here
+        const updatedVoter = { username: currentUser.username, voteType: vote };
+        return comment.voters.map((voter) =>
+          voter.username === currentUser.username
+            ? { ...voter, ...updatedVoter }
+            : voter
+        );
+      }
+    } else {
+      // add code goes here
+      const voter = { username: currentUser.username, voteType: vote };
+      return [...comment.voters, voter];
+    }
+  };
+
+  // get Text value from EditTextView
+  const setEditTextValue = (input: string) => {
+    ref.current = input;
+    console.log("🎁input: ", input);
+    console.log("🎀ref.current: ", ref.current);
   };
 
   return (
@@ -146,7 +172,11 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
             <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
           ) : (
             <section className="flex flex-col gap-2">
-              <Input text={comment?.content} ref={ref} />
+              {/* <Input text={comment.content} ref={ref} /> */}
+              <EditTextView
+                text={comment.content}
+                setTextInput={setEditTextValue}
+              />
               <Button
                 onClick={updateComment}
                 className="self-end px-3"
@@ -157,9 +187,10 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
         </section>
         <section className="flex items-center justify-between">
           <ScoreButton
+            canIvote={comment?.user.username === currentUser?.username}
             voting={voteValue}
             score={comment?.score}
-            setOnVoteListener={onVoteClick}
+            // setOnVoteListener={onVoteClick}
             setOnScoreListener={onScoreClick}
           />
           <section className="md:absolute md:top-6 md:right-10">

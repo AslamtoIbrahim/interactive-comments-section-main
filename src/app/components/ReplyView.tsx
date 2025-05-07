@@ -11,24 +11,13 @@ import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
 import tiemAgo from "./Functions";
 import ReplyToReply from "./ReplyToReply";
-import { Comment, CurrentUser, Reply } from "./Types";
+import { Comment, CurrentUser, Reply, Voters } from "./Types";
 import InstractiveContext from "../Store/CreateContext";
-
-type voteReplies = {
-  id: string;
-  vote: string;
-};
-
-type commentVotes = {
-  id: string;
-  vote: string;
-  voteReplies: voteReplies[];
-};
 
 type ReplyViewProps = {
   comment: Comment;
   reply: Reply;
-  currentUser?: CurrentUser;
+  currentUser: CurrentUser;
 };
 
 const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
@@ -40,30 +29,20 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
 
   // const votingRef = useRef<string>("");
   const voteReplyValue = useMemo(() => {
-    const localVotes = localStorage.getItem("votes");
-    if (localVotes) {
-      const listOfVotes: commentVotes[] = JSON.parse(localVotes);
-      const foundVoteComment = listOfVotes.find((cv) => cv.id === comment?.id);
-      if (foundVoteComment && Array.isArray(foundVoteComment?.voteReplies)) {
-        const foundVote = foundVoteComment?.voteReplies.find(
-          (rv) => rv.id === reply?.id
-        );
-        return foundVote?.vote || "";
-      }
-    }
-    return "";
-  }, [comment?.id, reply?.id]);
+    return (
+      reply.voters.find((voter) => voter.username === currentUser?.username)
+        ?.voteType ?? ""
+    );
+  }, [reply?.voters]);
 
   const handleEditClik = () => {
     seteditable(!editable);
   };
-  const handleDialog = () => {
+  const displayDeleteDialog = () => {
     setDialog(!dialog);
   };
-  const handleDelete = () => {
+  const deleteReplyClick = () => {
     // delete comment logic here
-     
-    // contextRely?.dispatch({ type: "DELETE_REPLY", payload: comRepl });
     //  delete a reply by sending it to dispatch function
     dataContext.deleteReply(comment?.id, reply?.id);
     setDialog(false);
@@ -105,56 +84,54 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
       content: text,
       createdAt: new Date().toISOString(),
     };
-    
 
     // contextRely?.dispatch({ type: "EDIT_REPLY", payload: editReply });
     //  update the reply by sending it to dispatch function
-    dataContext.updateReply(comment?.id, editedReply)
+    dataContext.updateReply(comment?.id, editedReply);
     ref.current!.value = "";
     seteditable(!editable);
   };
 
-  const onVoteReplyClick = (vote: string) => {
-    if (reply?.user.username === currentUser?.username) return;
-
-    const localVote = localStorage.getItem("votes");
-    if (localVote) {
-      const newVoteForReply = {
-        id: reply?.id,
-        vote: vote,
-      };
-      const listOfVotes: commentVotes[] = JSON.parse(localVote);
-      const newListOfVotes = listOfVotes.map((commentVote) =>
-        commentVote.id === comment?.id
-          ? {
-              ...commentVote,
-              voteReplies: commentVote.voteReplies.map((rv) =>
-                rv.id === reply?.id ? { ...rv, ...newVoteForReply } : rv
-              ),
-            }
-          : commentVote
-      );
-      console.log("newListOfVotes 🧡 ", newListOfVotes);
-      console.log("vote::::> ", vote);
-      localStorage.setItem("votes", JSON.stringify(newListOfVotes));
-      console.log("localVote: ▶🚹 ", localVote);
-    }
-  };
-
-  const onScoreReplyClick = (score: number) => {
+  const onScoreReplyClick = (score: number, vote: string) => {
     if (reply?.user.username === currentUser?.username) return;
 
     if (!score) return;
 
+    const updatedVoter = voteArrayHandl(vote);
     const scoreReply = {
       id: reply?.id,
       score: score,
+      voters: updatedVoter,
     };
 
-     
-    // contextRely?.dispatch({ type: "EDIT_REPLY", payload: scoreComent });
     // update score of the reply by sending it to dispatch
-    dataContext.updateReply(comment?.id, scoreReply)
+    dataContext.updateReply(comment?.id, scoreReply);
+  };
+
+  const voteArrayHandl = (vote: string): Voters[] => {
+    const found = reply.voters.find(
+      (voter) => voter.username === currentUser.username
+    );
+    if (found) {
+      if (vote === "") {
+        // delete code goes here
+        return reply.voters.filter(
+          (voter) => voter.username !== currentUser.username
+        );
+      } else {
+        // update code goes here
+        const updatedVoter = { username: currentUser.username, voteType: vote };
+        return reply.voters.map((voter) =>
+          voter.username === currentUser.username
+            ? { ...voter, ...updatedVoter }
+            : voter
+        );
+      }
+    } else {
+      // add code goes here
+      const voter = { username: currentUser.username, voteType: vote };
+      return [...reply.voters, voter];
+    }
   };
 
   return (
@@ -181,7 +158,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
             </p>
           ) : (
             <section className="flex flex-col gap-2">
-              <Input text={reply?.content} ref={ref} />
+              <Input ref={ref} />
               <Button
                 className="self-end px-3"
                 text="Update"
@@ -192,15 +169,15 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
         </section>
         <section className="flex items-center justify-between">
           <ScoreButton
+            canIvote={reply.user.username === currentUser?.username}
             voting={voteReplyValue}
             score={reply?.score}
-            setOnVoteListener={onVoteReplyClick}
             setOnScoreListener={onScoreReplyClick}
           />
           <section className="md:absolute md:top-6 md:right-10">
             {currentUser?.username == reply?.user.username ? (
               <div className="flex items-center gap-3">
-                <DeleteButton onClick={handleDialog} />
+                <DeleteButton onClick={displayDeleteDialog} />
                 <EditButton onClick={handleEditClik} />
               </div>
             ) : (
@@ -209,7 +186,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
           </section>
         </section>
         {dialog && (
-          <Dialog cancelClick={handleDialog} deleteClick={handleDelete} />
+          <Dialog cancelClick={displayDeleteDialog} deleteClick={deleteReplyClick} />
         )}
       </div>
       {isReply && (

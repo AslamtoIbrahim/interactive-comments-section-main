@@ -22,12 +22,13 @@ type commentVotes = {
 
 const Response = ({ currentUser }: ResponseProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
+  // const ref = useRef<string>("");
 
   const dataContext = useContext(InstractiveContext);
 
   // add comment to data
   const sendClick = () => {
-    const comment = ref.current!.value;
+    const comment = ref.current?.value;
     console.log("🌵 send: ", comment);
     if (comment === "") {
       return;
@@ -38,9 +39,10 @@ const Response = ({ currentUser }: ResponseProps) => {
 
     const newComment = {
       id: nexId,
-      content: comment,
+      content: comment!,
       createdAt: new Date().toISOString(),
       score: 0,
+      voters: [],
       user: {
         image: {
           png: currentUser?.image.png,
@@ -48,13 +50,17 @@ const Response = ({ currentUser }: ResponseProps) => {
         },
         username: currentUser?.username,
       },
-      replies: [] as Reply[],
+      replies:[],
     };
+
+    
     // add a new comment by sending it dispatch function
     dataContext.addComment(newComment);
-
+    
     // clear the textarea after adding a comment
     ref.current!.value = "";
+    console.log("🧼 ref: ", ref.current?.value);
+
     // add a new vote for this new comment
     // addNewVote(nexId);
   };
@@ -72,6 +78,8 @@ const Response = ({ currentUser }: ResponseProps) => {
       localStorage.setItem("votes", JSON.stringify(newListVote));
     }
   };
+
+  
 
   return (
     <div className="bg-white p-4 rounded-md font-rubik flex flex-col gap-3">

@@ -9,6 +9,7 @@ import {
   LOCAL_CURRENTUSER_KEY,
 } from "./Types";
 import InstractiveContext from "../Store/CreateContext";
+import EditTextView from "./EditTextView";
 
 const Main = () => {
   // const defaultUser = {
