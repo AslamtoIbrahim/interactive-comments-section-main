@@ -53,7 +53,7 @@ const Main = () => {
   }, []);
 
   return (
-    <div className="relative h-fill py-6 px-4 flex flex-col gap-2">
+    <div className="relative h-fill py-6 px-4 md:px-10 lg:px-20 xl:px-80 flex flex-col gap-2">
       {dataContext.comments && currentUser ? (
         <>
           {dataContext.comments.map((comment) => (
