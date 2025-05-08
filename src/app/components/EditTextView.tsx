@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import Button from "./Button";
+import React, { useEffect, useRef } from "react";
 
 type prop = {
   text: string;
@@ -7,20 +6,9 @@ type prop = {
 };
 const EditTextView = ({ text, setTextInput }: prop) => {
   const ref = useRef<HTMLTextAreaElement>(null);
-  const [play, setplay] = useState("play");
   useEffect(() => {
     ref.current!.value = text;
-    console.log("useEffect write: 🖋 ", ref.current!.value);
-    console.log("useEffect play: 🖋 ", play);
   }, []);
-
-  const clickme = () => {
-    console.log("write: 🖋 ", ref.current!.value);
-    setplay("stop");
-    console.log("play: 🖋 ", play);
-
-    ref.current!.value = "";
-  };
 
   const onchangeHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextInput(e.target.value);
@@ -28,7 +16,6 @@ const EditTextView = ({ text, setTextInput }: prop) => {
 
   return (
     <div>
-      {/* <Button onClick={clickme} /> */}
       <textarea
         onChange={onchangeHandler}
         ref={ref}

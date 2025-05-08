@@ -1,30 +1,19 @@
 "use client";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import ScoreButton from "./ScoreButton";
-import CurrentUserView from "./CurrentUserView";
-import EditButton from "./EditButton";
-import DeleteButton from "./DeleteButton";
-import Picture from "./Picture";
-import Input from "./Input";
-import Button from "./Button";
-import Dialog from "./Dialog";
-import ReplyButton from "./ReplyButton";
-import tiemAgo from "./Functions";
-import ReplyToComment from "./ReplyToComment";
-import { Comment, CurrentUser, Voters } from "./Types";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import InstractiveContext from "../Store/CreateContext";
+import Button from "./Button";
+import CurrentUserView from "./CurrentUserView";
+import DeleteButton from "./DeleteButton";
+import Dialog from "./Dialog";
+import EditButton from "./EditButton";
 import EditTextView from "./EditTextView";
+import tiemAgo from "./Functions";
+import Picture from "./Picture";
+import ReplyButton from "./ReplyButton";
+import ReplyToComment from "./ReplyToComment";
+import ScoreButton from "./ScoreButton";
+import { Comment, CurrentUser, Voters } from "./Types";
 
-type voteReplies = {
-  id: string;
-  vote: string;
-};
-
-type commentVotes = {
-  id: string;
-  vote: string;
-  voteReplies: voteReplies[];
-};
 
 type CommentViewProps = {
   comment: Comment;
@@ -34,7 +23,6 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   const [isCommentEditVisible, setIsCommentEditVisible] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isReplyVisible, setIsReplyVisible] = useState(false);
-  // const ref = useRef<HTMLTextAreaElement>(null);
   const ref = useRef(comment.content);
   const dataContext = useContext(InstractiveContext);
 
@@ -91,13 +79,6 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     setIsReplyVisible(!isReplyVisible);
     console.log("🧼 outside: ");
   };
-
-  // const onVoteClick = (votes: string) => {
-  //   if (comment?.user.username === currentUser?.username) return;
-
-  //   // add a new vote if there is none for this comment
-
-  // };
 
   // gets score value from the button
   const onScoreClick = (score: number, votes: string) => {
@@ -172,7 +153,6 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
             <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
           ) : (
             <section className="flex flex-col gap-2">
-              {/* <Input text={comment.content} ref={ref} /> */}
               <EditTextView
                 text={comment.content}
                 setTextInput={setEditTextValue}
@@ -190,7 +170,6 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
             canIvote={comment?.user.username === currentUser?.username}
             voting={voteValue}
             score={comment?.score}
-            // setOnVoteListener={onVoteClick}
             setOnScoreListener={onScoreClick}
           />
           <section className="md:absolute md:top-6 md:right-10">

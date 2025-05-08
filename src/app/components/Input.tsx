@@ -1,4 +1,4 @@
-import React, { ForwardedRef, useEffect } from "react";
+import React, { ForwardedRef } from "react";
 
 const InputInner = (
   _props: unknown,

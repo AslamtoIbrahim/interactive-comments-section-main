@@ -27,13 +27,12 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   const dataContext = useContext(InstractiveContext);
 
-  // const votingRef = useRef<string>("");
   const voteReplyValue = useMemo(() => {
     return (
       reply.voters.find((voter) => voter.username === currentUser?.username)
         ?.voteType ?? ""
     );
-  }, [reply?.voters]);
+  }, [reply.voters, currentUser.username]);
 
   const handleEditClik = () => {
     seteditable(!editable);
@@ -61,11 +60,10 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
     if (ref.current) {
       ref.current!.value = `@${reply?.replyingTo}` + " " + reply?.content;
     }
-  }, [editable]);
+  }, [editable, reply.replyingTo, reply.content]);
 
   const handleReply = () => {
     setIsReply(!isReply);
-    console.log("🧼 outside: ");
   };
 
   const editReply = () => {
@@ -74,9 +72,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
       seteditable(!editable);
       return;
     }
-
-    console.log("🎃 username: ", reply?.user.username);
-    console.log("🎃 replyingto: ", reply?.replyingTo);
+ 
     // delete @username from the content before adding it
     const text = editinput.replace(`@${reply?.replyingTo} `, "");
     const editedReply = {
@@ -85,7 +81,6 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
       createdAt: new Date().toISOString(),
     };
 
-    // contextRely?.dispatch({ type: "EDIT_REPLY", payload: editReply });
     //  update the reply by sending it to dispatch function
     dataContext.updateReply(comment?.id, editedReply);
     ref.current!.value = "";
@@ -186,7 +181,10 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
           </section>
         </section>
         {dialog && (
-          <Dialog cancelClick={displayDeleteDialog} deleteClick={deleteReplyClick} />
+          <Dialog
+            cancelClick={displayDeleteDialog}
+            deleteClick={deleteReplyClick}
+          />
         )}
       </div>
       {isReply && (

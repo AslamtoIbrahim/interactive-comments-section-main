@@ -31,7 +31,6 @@ const ScoreButton = ({
     console.log("votes ✅  ", votes.current);
     const newVote = votes.current === "" ? "up" : "";
     votes.current = newVote;
-    // setOnVoteListener?.(newVote);
 
     const newScore = scores + 1;
     setScores(newScore);
@@ -46,7 +45,6 @@ const ScoreButton = ({
 
     const newVote = votes.current === "" ? "down" : "";
     votes.current = newVote;
-    // setOnVoteListener?.(newVote);
 
     const newScore = scores - 1;
     setScores(newScore);
