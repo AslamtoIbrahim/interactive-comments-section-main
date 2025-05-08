@@ -11,7 +11,6 @@ import {
 import InstractiveContext from "../Store/CreateContext";
 
 const Main = () => {
-   
   const [currentUser, setCurrentUser] = useState<CurrentUser>();
   const dataContext = useContext(InstractiveContext);
 
@@ -53,11 +52,8 @@ const Main = () => {
     }
   }, []);
 
-   
-
   return (
     <div className="relative h-fill py-6 px-4 flex flex-col gap-2">
-      {/* <p className="text-grayish-blue md:text-lg">wait ...</p> */}
       {dataContext.comments && currentUser ? (
         <>
           {dataContext.comments.map((comment) => (
@@ -70,7 +66,9 @@ const Main = () => {
           <Response currentUser={currentUser} />
         </>
       ) : (
-      <p className="text-grayish-blue md:text-lg">wait ...</p>
+        <div className="h-screen flex justify-center items-center">
+          <p className="text-grayish-blue text-lg md:text-2xl">wait ...</p>
+        </div>
       )}
     </div>
   );
