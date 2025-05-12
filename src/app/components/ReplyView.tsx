@@ -90,7 +90,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   };
 
   const onScoreReplyClick = (score: number, vote: string) => {
-    const updatedVoter = voteArrayHandl(vote);
+    const updatedVoter = handleUserVote(vote);
     const scoreReply = {
       id: reply.id,
       score: score,
@@ -101,30 +101,32 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
     dataContext.updateReply(comment.id, scoreReply);
   };
 
-  const voteArrayHandl = (vote: string): Voters[] => {
-    const found = reply.voters.find(
+  const handleUserVote = (vote: string): Voters[] => {
+    const userHasVoted = reply.voters.find(
       (voter) => voter.username === currentUser.username
     );
-    if (found) {
-      if (vote === "") {
-        // delete code goes here
-        return reply.voters.filter(
-          (voter) => voter.username !== currentUser.username
-        );
-      } else {
-        // update code goes here
-        const updatedVoter = { username: currentUser.username, voteType: vote };
-        return reply.voters.map((voter) =>
-          voter.username === currentUser.username
-            ? { ...voter, ...updatedVoter }
-            : voter
-        );
-      }
-    } else {
-      // add code goes here
+
+    // User never voted before : Add
+    if (!userHasVoted) {
       const voter = { username: currentUser.username, voteType: vote };
       return [...reply.voters, voter];
     }
+
+    // User already voted before : Remove
+    if (vote === "") {
+      // delete code goes here
+      return reply.voters.filter(
+        (voter) => voter.username !== currentUser.username
+      );
+    }
+
+    // User already voted before : Update
+    const updatedVoter = { username: currentUser.username, voteType: vote };
+    return reply.voters.map((voter) =>
+      voter.username === currentUser.username
+        ? { ...voter, ...updatedVoter }
+        : voter
+    );
   };
 
   return (

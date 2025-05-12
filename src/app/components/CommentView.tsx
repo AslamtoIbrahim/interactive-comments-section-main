@@ -27,7 +27,8 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
 
   const voteValue = useMemo(() => {
     return (
-      comment.voters.find((voter) => voter.username === currentUser.username)?.voteType ?? ""
+      comment.voters.find((voter) => voter.username === currentUser.username)
+        ?.voteType ?? ""
     );
   }, [comment?.voters, currentUser.username]);
 
@@ -86,7 +87,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   // gets score value from the button
   const onScoreClick = (score: number, votes: string) => {
     console.log("score , votes 🎫 : ", score, votes);
-    const voters = voteArrayHandl(votes);
+    const voters = handleUserVote(votes);
     const updatedScore = {
       id: comment.id,
       score: score,
@@ -96,33 +97,34 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     dataContext.updateComment(updatedScore);
   };
 
-  const voteArrayHandl = (vote: string): Voters[] => {
-    const found = comment.voters.find(
+  const handleUserVote = (vote: string): Voters[] => {
+    const userHasVoted = comment.voters.find(
       (voter) => voter.username === currentUser.username
     );
-    if (found) {
-      if (vote === "") {
-        // delete code goes here
-        return comment.voters.filter(
-          (voter) => voter.username !== currentUser.username
-        );
-      } else {
-        // update code goes here
-        const updatedVoter = { username: currentUser.username, voteType: vote };
-        return comment.voters.map((voter) =>
-          voter.username === currentUser.username
-            ? { ...voter, ...updatedVoter }
-            : voter
-        );
-      }
-    } else {
-      // add code goes here
+
+    // User never voted before : Add
+    if (!userHasVoted) {
       const voter = { username: currentUser.username, voteType: vote };
       return [...comment.voters, voter];
     }
+
+    // User voted before : Remove
+    if (vote === "") {
+      return comment.voters.filter(
+        (voter) => voter.username !== currentUser.username
+      );
+    }
+
+    // User already voted : Update
+    const updatedVoter = { username: currentUser.username, voteType: vote };
+    return comment.voters.map((voter) =>
+      voter.username === currentUser.username
+        ? { ...voter, ...updatedVoter }
+        : voter
+    );
   };
 
-  // get Text value from EditTextView
+  // get Text value from EditTextView component
   const setEditTextValue = (input: string) => {
     ref.current = input;
   };
@@ -132,10 +134,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
       <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
         <section className="w-full flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Picture
-              mb={comment.user.image.png}
-              dt={comment.user.image.webp}
-            />
+            <Picture mb={comment.user.image.png} dt={comment.user.image.webp} />
             <p className="font-semibold text-sm md:text-lg text-dark-blue">
               {comment.user.username}
             </p>
