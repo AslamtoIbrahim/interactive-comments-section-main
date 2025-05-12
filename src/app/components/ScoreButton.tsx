@@ -2,7 +2,6 @@
 import React, { useRef, useState } from "react";
 
 interface ButtonProps {
-  canIvote: boolean;
   voting: string;
   score: number;
   // setOnVoteListener?: (vote: string) => void;
@@ -10,7 +9,6 @@ interface ButtonProps {
 }
 
 const ScoreButton = ({
-  canIvote,
   voting,
   score,
   // setOnVoteListener,
@@ -23,7 +21,6 @@ const ScoreButton = ({
 
 
   const handleIncrement = () => {
-    if (canIvote) return;
 
     console.log("befor testing voests 🔵  ", votes.current);
     if (votes.current === "up") return;
@@ -39,7 +36,6 @@ const ScoreButton = ({
   };
 
   const handleDecrement = () => {
-    if (canIvote) return;
 
     if (votes.current === "down") return;
 

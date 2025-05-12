@@ -42,9 +42,11 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   };
   const deleteReplyClick = () => {
     // delete comment logic here
+    setDialog(!dialog);
+    document.body.style.overflow = "visible";
+    
     //  delete a reply by sending it to dispatch function
     dataContext.deleteReply(comment?.id, reply?.id);
-    setDialog(false);
   };
 
   useEffect(() => {
@@ -88,7 +90,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   };
 
   const onScoreReplyClick = (score: number, vote: string) => {
-    if (reply?.user.username === currentUser?.username) return;
+    // if (reply?.user.username === currentUser?.username) return;
 
     if (!score) return;
 
@@ -164,7 +166,6 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
         </section>
         <section className="flex items-center justify-between">
           <ScoreButton
-            canIvote={reply.user.username === currentUser?.username}
             voting={voteReplyValue}
             score={reply?.score}
             setOnScoreListener={onScoreReplyClick}

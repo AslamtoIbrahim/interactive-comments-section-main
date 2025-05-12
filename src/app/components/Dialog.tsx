@@ -17,10 +17,11 @@ const Dialog = ({ deleteClick, cancelClick }: DialogProps) => {
   };
   return (
     <div
+      onClick={handleCancel}
       className={`bg-black/65 inset-0 w-full h-screen fixed z-10 flex items-center justify-center
      ${canceled && `hidden`}`}
     >
-      <div className="bg-white mx-4 md:mx-20 lg:mx-40 p-4 font-rubik rounded-lg flex flex-col gap-3">
+      <div className="bg-white max-w-[32rem] mx-4 md:mx-20 lg:mx-40 p-4 font-rubik rounded-lg flex flex-col gap-3">
         <h2 className="text-lg text-dark-blue font-medium">Delete comment</h2>
         <p className="text-grayish-blue">
           Are you sure you want to delete this comment? This will remove the

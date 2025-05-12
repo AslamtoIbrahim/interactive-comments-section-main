@@ -14,7 +14,6 @@ import ReplyToComment from "./ReplyToComment";
 import ScoreButton from "./ScoreButton";
 import { Comment, CurrentUser, Voters } from "./Types";
 
-
 type CommentViewProps = {
   comment: Comment;
   currentUser: CurrentUser;
@@ -31,9 +30,11 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
       comment?.voters.find((voter) => voter.username === currentUser.username)
         ?.voteType ?? ""
     );
-  }, [comment?.voters]);
+  }, [comment?.voters, currentUser.username]);
 
   useEffect(() => {
+    console.log("first", isDialogVisible);
+
     if (isDialogVisible) {
       document.body.style.overflow = "hidden";
     } else {
@@ -46,15 +47,18 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     setIsCommentEditVisible(!isCommentEditVisible);
   };
 
-  // 🗑 Delete button
   const showAndHideDialog = () => {
     setIsDialogVisible(!isDialogVisible);
+    console.log("first", isDialogVisible);
   };
 
+  // 🗑 Delete button
   const deleteComment = () => {
+    setIsDialogVisible(!isDialogVisible);
+    document.body.style.overflow = "visible";
+
     // delete a comment by sending id to dispatch function
     dataContext.deleteComment(comment?.id);
-    setIsDialogVisible(false);
   };
 
   const updateComment = () => {
@@ -82,7 +86,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
 
   // gets score value from the button
   const onScoreClick = (score: number, votes: string) => {
-    if (comment?.user.username === currentUser?.username) return;
+    // if (comment?.user.username === currentUser?.username) return;
 
     if (!score) return;
 
@@ -167,7 +171,6 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
         </section>
         <section className="flex items-center justify-between">
           <ScoreButton
-            canIvote={comment?.user.username === currentUser?.username}
             voting={voteValue}
             score={comment?.score}
             setOnScoreListener={onScoreClick}
