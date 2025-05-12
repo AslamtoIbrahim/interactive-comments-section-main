@@ -7,7 +7,7 @@ import {
   UpdatedComment,
   UpdatedReply,
   LOCAL_COMMENT_KEY,
-} from "../components/Types";
+} from "../../utils/Types";
 
 const defaultCommentsState: Comment[] = [];
 

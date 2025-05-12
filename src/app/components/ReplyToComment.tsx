@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef } from "react";
 import Input from "./Input";
 import Picture from "./Picture";
 import Button from "./Button";
-import { CurrentUser, Comment } from "./Types";
+import { CurrentUser, Comment } from "../../utils/Types";
 import InstractiveContext from "../Store/CreateContext";
 
 type voteReplies = {
@@ -18,7 +18,7 @@ type commentVotes = {
 
 type RplyBoxProps = {
   comment: Comment;
-  currentUser?: CurrentUser;
+  currentUser: CurrentUser;
   closeReplyBox: () => void;
 };
 

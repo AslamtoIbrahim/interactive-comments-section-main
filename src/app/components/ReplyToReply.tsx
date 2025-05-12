@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useRef } from "react";
 import Input from "./Input";
 import Picture from "./Picture";
 import Button from "./Button";
-import { Comment, CurrentUser, Reply } from "./Types";
+import { Comment, CurrentUser, Reply } from "../../utils/Types";
 import InstractiveContext from "../Store/CreateContext";
 
 type ReplyToReplyProps = {
-  currentUser?: CurrentUser;
+  currentUser: CurrentUser;
   comment: Comment;
   reply: Reply;
   closeReplyBox: () => void;

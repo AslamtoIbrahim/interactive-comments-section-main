@@ -9,9 +9,9 @@ import Input from "./Input";
 import Button from "./Button";
 import Dialog from "./Dialog";
 import ReplyButton from "./ReplyButton";
-import tiemAgo from "./Functions";
+import getTimeAgo from "../../utils/helpers";
 import ReplyToReply from "./ReplyToReply";
-import { Comment, CurrentUser, Reply, Voters } from "./Types";
+import { Comment, CurrentUser, Reply, Voters } from "../../utils/Types";
 import InstractiveContext from "../Store/CreateContext";
 
 type ReplyViewProps = {
@@ -44,7 +44,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
     // delete comment logic here
     setDialog(!dialog);
     document.body.style.overflow = "visible";
-    
+
     //  delete a reply by sending it to dispatch function
     dataContext.deleteReply(comment?.id, reply?.id);
   };
@@ -74,13 +74,13 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
       seteditable(!editable);
       return;
     }
- 
+
     // delete @username from the content before adding it
     const text = editinput.replace(`@${reply?.replyingTo} `, "");
     const editedReply = {
       id: reply?.id,
       content: text,
-      createdAt: new Date().toISOString(),
+      edited: "edited",
     };
 
     //  update the reply by sending it to dispatch function
@@ -143,8 +143,9 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
             {currentUser?.username === reply?.user.username && (
               <CurrentUserView />
             )}
-            <p className="text-grayish-blue text-sm md:text-lg">
-              {tiemAgo(reply!.createdAt)}
+            <p className="text-grayish-blue text-[12px] md:text-lg ">
+              {getTimeAgo(reply!.createdAt)}
+              {reply.edited && <span> ({reply.edited})</span>}
             </p>
           </div>
 

@@ -2,7 +2,7 @@ import React, { useContext, useRef } from "react";
 import Input from "./Input";
 import Button from "./Button";
 import Picture from "./Picture";
-import { CurrentUser } from "./Types";
+import { CurrentUser } from "../../utils/Types";
 import InstractiveContext from "../Store/CreateContext";
 
 type ResponseProps = {

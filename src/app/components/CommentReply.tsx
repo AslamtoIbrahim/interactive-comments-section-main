@@ -1,6 +1,6 @@
 import CommentView from "./CommentView";
 import ReplyView from "./ReplyView";
-import { Comment, CurrentUser } from "./Types";
+import { Comment, CurrentUser } from "../../utils/Types";
 
 type InteractiveComment = {
   currentUser: CurrentUser;
@@ -10,7 +10,7 @@ const CommentReply = ({ comment, currentUser }: InteractiveComment) => {
   return (
     <div className="flex flex-col gap-4">
       <CommentView comment={comment} currentUser={currentUser} />
-      <div className="flex flex-col border-l-2  border-grayish-blue/30  pl-4 lg:ml-8 lg:pl-8 gap-2">
+      <div className="flex flex-col border-l-2  border-grayish-blue/30  pl-2 lg:ml-8 lg:pl-8 gap-2">
         {comment.replies.map((reply) => (
           <ReplyView
             comment={comment}

@@ -6,18 +6,17 @@ type ImageProps = {
   dt: string;
 };
 const Picture = ({ mb, dt }: ImageProps) => {
-  console.log('mb', mb);
+  console.log("mb", mb);
   return (
     <picture>
-      <source srcSet={mb} type="image/webp" media="(min-width: 768px)" />
-       <Image
-          className="h-auto"
-          src={dt}
-          alt="Profile Picture"
-          width={35}
-          height={35}
-          quality={100}
-        />
+      <source srcSet={dt} type="image/webp" media="(min-width: 768px)" />
+      <img
+        className="h-auto"
+        src={mb}
+        alt="Profile Picture"
+        width={30}
+        height={30}
+      />
     </picture>
   );
 };

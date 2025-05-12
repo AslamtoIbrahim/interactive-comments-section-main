@@ -7,12 +7,12 @@ import DeleteButton from "./DeleteButton";
 import Dialog from "./Dialog";
 import EditButton from "./EditButton";
 import EditTextView from "./EditTextView";
-import tiemAgo from "./Functions";
+import getTimeAgo from "../../utils/helpers";
 import Picture from "./Picture";
 import ReplyButton from "./ReplyButton";
 import ReplyToComment from "./ReplyToComment";
 import ScoreButton from "./ScoreButton";
-import { Comment, CurrentUser, Voters } from "./Types";
+import { Comment, CurrentUser, Voters } from "../../utils/Types";
 
 type CommentViewProps = {
   comment: Comment;
@@ -70,7 +70,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     const editedComment = {
       id: comment?.id,
       content: commentEdit,
-      createdAt: new Date().toISOString(),
+      edited: "edited",
     };
     // update a comment by sending a new comment to dispatch function
     dataContext.updateComment(editedComment);
@@ -130,8 +130,6 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
   // get Text value from EditTextView
   const setEditTextValue = (input: string) => {
     ref.current = input;
-    console.log("🎁input: ", input);
-    console.log("🎀ref.current: ", ref.current);
   };
 
   return (
@@ -140,8 +138,8 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
         <section className="w-full flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Picture
-              mb={comment?.user.image.png}
-              dt={comment?.user.image.webp}
+              mb={comment.user.image.png}
+              dt={comment.user.image.webp}
             />
             <p className="font-semibold text-sm md:text-lg text-dark-blue">
               {comment?.user.username}
@@ -149,8 +147,9 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
             {currentUser?.username === comment?.user.username && (
               <CurrentUserView />
             )}
-            <p className="text-grayish-blue text-sm md:text-lg">
-              {tiemAgo(comment!.createdAt)}
+            <p className="text-grayish-blue text-[12px] md:text-lg ">
+              {getTimeAgo(comment!.createdAt)}
+              {comment.edited && <span> ({comment.edited})</span>}
             </p>
           </div>
           {!isCommentEditVisible ? (

@@ -1,6 +1,6 @@
-const tiemAgo = (timesamp) => {
+const getTimeAgo = (timestamp : string) => {
     const now = new Date();
-    const past = new Date(timesamp);
+    const past = new Date(timestamp);
     const seconds = Math.floor((now.getTime() - past.getTime()) / 1000);
 
     if (seconds < 60) return "just now";
@@ -18,4 +18,4 @@ const tiemAgo = (timesamp) => {
     return `${years} year${years > 1 ? "s" : ""} ago`;
   };
 
-  export default tiemAgo;
+  export default getTimeAgo;

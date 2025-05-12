@@ -1,5 +1,5 @@
 import React from "react";
-import { ContextType } from "../components/Types";
+import { ContextType } from "../../utils/Types";
 
 const InstractiveContext = React.createContext<ContextType>({
   comments: [],

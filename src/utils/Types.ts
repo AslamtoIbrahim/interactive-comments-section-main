@@ -13,6 +13,7 @@ export type Comment = {
   id: string;
   content: string;
   createdAt: string;
+  edited: string;
   score: number;
   voters: Voters[];
   user: {
@@ -29,6 +30,7 @@ export type Reply = {
   id: string;
   content: string;
   createdAt: string;
+  edited: string;
   score: number;
   voters: Voters[];
   replyingTo: string;
@@ -55,13 +57,13 @@ type AddedReply = {
 export type UpdatedCommontContent = {
   id: string;
   content: string;
-  createdAt: string;
+  edited: string;
 };
 
 export type UpdatedReplyContent = {
   id: string;
   content: string;
-  createdAt: string;
+  edited: string;
 };
 
 type UpdatedScoreReply = {

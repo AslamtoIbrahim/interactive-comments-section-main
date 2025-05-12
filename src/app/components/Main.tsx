@@ -7,7 +7,7 @@ import {
   Comment,
   LOCAL_COMMENT_KEY,
   LOCAL_CURRENTUSER_KEY,
-} from "./Types";
+} from "../../utils/Types";
 import InstractiveContext from "../Store/CreateContext";
 
 const Main = () => {
@@ -53,7 +53,7 @@ const Main = () => {
   }, []);
 
   return (
-    <div className="relative h-fill py-6 px-4 md:px-10 lg:px-20 xl:px-[35rem] flex flex-col gap-2">
+    <div className="relative h-fill py-6 px-2 md:px-10 lg:px-20 xl:px-[35rem] flex flex-col gap-2">
       {dataContext.comments && currentUser ? (
         <>
           {dataContext.comments.map((comment) => (
