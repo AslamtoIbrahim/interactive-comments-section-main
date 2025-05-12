@@ -46,7 +46,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
     document.body.style.overflow = "visible";
 
     //  delete a reply by sending it to dispatch function
-    dataContext.deleteReply(comment?.id, reply?.id);
+    dataContext.deleteReply(comment.id, reply.id);
   };
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
   useEffect(() => {
     // add user replying to and the content togather
     if (ref.current) {
-      ref.current!.value = `@${reply?.replyingTo}` + " " + reply?.content;
+      ref.current!.value = `@${reply.replyingTo}` + " " + reply.content;
     }
   }, [editable, reply.replyingTo, reply.content]);
 
@@ -70,39 +70,35 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
 
   const editReply = () => {
     const editinput = ref.current!.value;
-    if (editinput.trim() === reply?.replyingTo.trim() || editinput === "") {
+    if (editinput.trim() === reply.replyingTo.trim() || editinput === "") {
       seteditable(!editable);
       return;
     }
 
     // delete @username from the content before adding it
-    const text = editinput.replace(`@${reply?.replyingTo} `, "");
+    const text = editinput.replace(`@${reply.replyingTo} `, "");
     const editedReply = {
-      id: reply?.id,
+      id: reply.id,
       content: text,
       edited: "edited",
     };
 
     //  update the reply by sending it to dispatch function
-    dataContext.updateReply(comment?.id, editedReply);
+    dataContext.updateReply(comment.id, editedReply);
     ref.current!.value = "";
     seteditable(!editable);
   };
 
   const onScoreReplyClick = (score: number, vote: string) => {
-    // if (reply?.user.username === currentUser?.username) return;
-
-    if (!score) return;
-
     const updatedVoter = voteArrayHandl(vote);
     const scoreReply = {
-      id: reply?.id,
+      id: reply.id,
       score: score,
       voters: updatedVoter,
     };
 
     // update score of the reply by sending it to dispatch
-    dataContext.updateReply(comment?.id, scoreReply);
+    dataContext.updateReply(comment.id, scoreReply);
   };
 
   const voteArrayHandl = (vote: string): Voters[] => {
@@ -136,23 +132,23 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
       <div className="bg-white p-4 rounded-md font-rubik flex flex-col md:flex-row-reverse md:relative md:items-start gap-3 md:gap-4">
         <section className="w-full flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Picture mb={reply?.user.image.png} dt={reply?.user.image.webp} />
+            <Picture mb={reply.user.image.png} dt={reply.user.image.webp} />
             <p className="font-semibold text-sm md:text-lg text-dark-blue">
-              {reply?.user.username}{" "}
+              {reply.user.username}{" "}
             </p>
-            {currentUser?.username === reply?.user.username && (
+            {currentUser.username === reply.user.username && (
               <CurrentUserView />
             )}
             <p className="text-grayish-blue text-[12px] md:text-lg ">
-              {getTimeAgo(reply!.createdAt)}
+              {getTimeAgo(reply.createdAt)}
               {reply.edited && <span> ({reply.edited})</span>}
             </p>
           </div>
 
           {!editable ? (
             <p className="text-grayish-blue md:text-lg">
-              <span className="text-moderate-blue font-medium">{`@${reply?.replyingTo}`}</span>{" "}
-              {reply?.content}
+              <span className="text-moderate-blue font-medium">{`@${reply.replyingTo}`}</span>{" "}
+              {reply.content}
             </p>
           ) : (
             <section className="flex flex-col gap-2">
@@ -168,11 +164,11 @@ const ReplyView = ({ comment, reply, currentUser }: ReplyViewProps) => {
         <section className="flex items-center justify-between">
           <ScoreButton
             voting={voteReplyValue}
-            score={reply?.score}
+            score={reply.score}
             setOnScoreListener={onScoreReplyClick}
           />
           <section className="md:absolute md:top-6 md:right-10">
-            {currentUser?.username == reply?.user.username ? (
+            {currentUser.username == reply.user.username ? (
               <div className="flex items-center gap-3">
                 <DeleteButton onClick={displayDeleteDialog} />
                 <EditButton onClick={handleEditClik} />

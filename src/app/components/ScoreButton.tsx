@@ -8,14 +8,12 @@ const NO_VOTE = "";
 interface ButtonProps {
   voting: string;
   score: number;
-  // setOnVoteListener?: (vote: string) => void;
-  setOnScoreListener?: (score: number, vote: string) => void;
+  setOnScoreListener: (score: number, vote: string) => void;
 }
 
 const ScoreButton = ({
   voting,
   score,
-  // setOnVoteListener,
   setOnScoreListener,
 }: ButtonProps) => {
   const [scores, setScores] = useState(score);
@@ -31,7 +29,7 @@ const ScoreButton = ({
       setScores(newScore);
       const newVote = NO_VOTE;
       votes.current = newVote;
-      setOnScoreListener?.(newScore, newVote);
+      setOnScoreListener(newScore, newVote);
       return;
     }
 
@@ -40,7 +38,7 @@ const ScoreButton = ({
       setScores(newScore);
       const newVote = UP;
       votes.current = newVote;
-      setOnScoreListener?.(newScore, newVote);
+      setOnScoreListener(newScore, newVote);
       return;
     }
 
@@ -51,7 +49,7 @@ const ScoreButton = ({
     const newScore = scores + 1;
     setScores(newScore);
 
-    setOnScoreListener?.(newScore, newVote);
+    setOnScoreListener(newScore, newVote);
   };
 
   const handleDecrement = () => {
@@ -60,7 +58,7 @@ const ScoreButton = ({
       setScores(newScore);
       const newVote = "";
       votes.current = newVote;
-      setOnScoreListener?.(newScore, newVote);
+      setOnScoreListener(newScore, newVote);
       return;
     }
 
@@ -69,7 +67,7 @@ const ScoreButton = ({
       setScores(newScore);
       const newVote = DOWN;
       votes.current = newVote;
-      setOnScoreListener?.(newScore, newVote);
+      setOnScoreListener(newScore, newVote);
       return;
     }
 
@@ -79,13 +77,13 @@ const ScoreButton = ({
     const newScore = scores - 1;
     setScores(newScore);
 
-    setOnScoreListener?.(newScore, newVote);
+    setOnScoreListener(newScore, newVote);
   };
   return (
-    <div className="bg-very-light-gray text-moderate-blue/55  w-fit font-rubik font-medium  md:text-lg py-1 px-3 md:px-4 rounded-lg flex md:flex-col items-center   gap-4 md:gap-2  ">
+    <div className="bg-very-light-gray text-moderate-blue/55  w-fit font-rubik  font-medium  md:text-lg py-1 px-3 md:px-4 rounded-lg flex md:flex-col items-center   gap-4 md:gap-2  ">
       <button
         onClick={handleIncrement}
-        className={`cursor-pointer hover:text-moderate-blue ${
+        className={`cursor-pointer text-lg  hover:text-moderate-blue ${
           voting === "up" ? "text-moderate-blue" : ""
         }`}
       >
@@ -94,7 +92,7 @@ const ScoreButton = ({
       <p className="text-moderate-blue">{scores}</p>
       <button
         onClick={handleDecrement}
-        className={`cursor-pointer hover:text-moderate-blue ${
+        className={`cursor-pointer text-lg hover:text-moderate-blue ${
           voting === "down" ? "text-moderate-blue" : ""
         }`}
       >

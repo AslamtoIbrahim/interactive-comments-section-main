@@ -45,15 +45,16 @@ const ReplyToReply = ({
       id: newId,
       content: text,
       createdAt: new Date().toISOString(),
+      edited: "",
       score: 0,
       voters: [],
       replyingTo: reply.user.username,
       user: {
         image: {
-          png: currentUser?.image.png as string,
-          webp: currentUser?.image.webp as string,
+          png: currentUser.image.png as string,
+          webp: currentUser.image.webp as string,
         },
-        username: currentUser?.username as string,
+        username: currentUser.username as string,
       },
     };
     const updatedComment = {
@@ -69,7 +70,7 @@ const ReplyToReply = ({
     <div className="bg-white p-4 rounded-md font-rubik flex flex-col gap-3">
       <Input ref={ref} />
       <section className="flex items-center justify-between">
-        <Picture mb={currentUser?.image.png} dt={currentUser?.image.webp} />
+        <Picture mb={currentUser.image.png} dt={currentUser.image.webp} />
         <Button onClick={setReply} text="Reply" />
       </section>
     </div>

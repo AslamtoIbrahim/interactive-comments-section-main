@@ -27,8 +27,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
 
   const voteValue = useMemo(() => {
     return (
-      comment?.voters.find((voter) => voter.username === currentUser.username)
-        ?.voteType ?? ""
+      comment.voters.find((voter) => voter.username === currentUser.username)?.voteType ?? ""
     );
   }, [comment?.voters, currentUser.username]);
 
@@ -58,7 +57,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
     document.body.style.overflow = "visible";
 
     // delete a comment by sending id to dispatch function
-    dataContext.deleteComment(comment?.id);
+    dataContext.deleteComment(comment.id);
   };
 
   const updateComment = () => {
@@ -68,7 +67,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
       return;
     }
     const editedComment = {
-      id: comment?.id,
+      id: comment.id,
       content: commentEdit,
       edited: "edited",
     };
@@ -86,14 +85,10 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
 
   // gets score value from the button
   const onScoreClick = (score: number, votes: string) => {
-    // if (comment?.user.username === currentUser?.username) return;
-
-    if (!score) return;
-
     console.log("score , votes 🎫 : ", score, votes);
     const voters = voteArrayHandl(votes);
     const updatedScore = {
-      id: comment?.id,
+      id: comment.id,
       score: score,
       voters: voters,
     };
@@ -142,9 +137,9 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
               dt={comment.user.image.webp}
             />
             <p className="font-semibold text-sm md:text-lg text-dark-blue">
-              {comment?.user.username}
+              {comment.user.username}
             </p>
-            {currentUser?.username === comment?.user.username && (
+            {currentUser.username === comment.user.username && (
               <CurrentUserView />
             )}
             <p className="text-grayish-blue text-[12px] md:text-lg ">
@@ -153,7 +148,7 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
             </p>
           </div>
           {!isCommentEditVisible ? (
-            <p className="text-grayish-blue md:text-lg">{comment?.content}</p>
+            <p className="text-grayish-blue md:text-lg">{comment.content}</p>
           ) : (
             <section className="flex flex-col gap-2">
               <EditTextView
@@ -171,11 +166,11 @@ const CommentView = ({ comment, currentUser }: CommentViewProps) => {
         <section className="flex items-center justify-between">
           <ScoreButton
             voting={voteValue}
-            score={comment?.score}
+            score={comment.score}
             setOnScoreListener={onScoreClick}
           />
           <section className="md:absolute md:top-6 md:right-10">
-            {currentUser?.username == comment?.user.username ? (
+            {currentUser.username == comment?.user.username ? (
               <div className="flex items-center gap-3">
                 <DeleteButton onClick={showAndHideDialog} />
                 <EditButton onClick={onButtonEditClick} />

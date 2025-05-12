@@ -3,7 +3,7 @@ import React from "react";
 import repIcon from "../../../public/source/images/icon-edit.svg";
 
 interface ButtonProps {
-  onClick?: () => void;
+  onClick: () => void;
 }
 const EditButton = ({ onClick }: ButtonProps) => {
   return (
@@ -12,7 +12,7 @@ const EditButton = ({ onClick }: ButtonProps) => {
       className="cursor-pointer text-sm md:text-base  font-rubik text-moderate-blue font-medium flex items-center gap-1
     hover:opacity-40"
     >
-      <Image src={repIcon} alt="reply" />
+      <Image src={repIcon} alt="edit button" />
       <span>Edit</span>
     </button>
   );

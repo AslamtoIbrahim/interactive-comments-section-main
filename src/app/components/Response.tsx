@@ -30,14 +30,15 @@ const Response = ({ currentUser }: ResponseProps) => {
       id: nexId,
       content: comment!,
       createdAt: new Date().toISOString(),
+      edited: "",
       score: 0,
       voters: [],
       user: {
         image: {
-          png: currentUser?.image.png,
-          webp: currentUser?.image.webp,
+          png: currentUser.image.png,
+          webp: currentUser.image.webp,
         },
-        username: currentUser?.username,
+        username: currentUser.username,
       },
       replies: [],
     };
@@ -56,7 +57,7 @@ const Response = ({ currentUser }: ResponseProps) => {
     <div className="bg-white p-4 rounded-md font-rubik flex flex-col gap-3">
       <Input ref={ref} />
       <section className="flex items-center justify-between">
-        <Picture mb={currentUser?.image.png} dt={currentUser?.image.webp} />
+        <Picture mb={currentUser.image.png} dt={currentUser.image.webp} />
         <Button onClick={sendClick} />
       </section>
     </div>

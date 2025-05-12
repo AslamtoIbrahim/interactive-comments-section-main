@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 
 interface DialogProps {
-  deleteClick?: () => void;
-  cancelClick?: () => void;
+  deleteClick: () => void;
+  cancelClick: () => void;
 }
 const Dialog = ({ deleteClick, cancelClick }: DialogProps) => {
   const [canceled, setCanceled] = useState(false);
   const handleCancel = () => {
     setCanceled(true);
-    cancelClick?.();
+    cancelClick();
   };
   const handleDelete = () => {
     setCanceled(true);
-    deleteClick?.();
+    deleteClick();
   };
   return (
     <div

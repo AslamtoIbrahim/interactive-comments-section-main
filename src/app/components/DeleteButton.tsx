@@ -3,7 +3,7 @@ import React from "react";
 import repIcon from "../../../public/source/images/icon-delete.svg";
 
 interface ButtonProps {
-  onClick?: () => void;
+  onClick: () => void;
 }
 const DeleteButton = ({ onClick }: ButtonProps) => {
   return (
@@ -12,7 +12,7 @@ const DeleteButton = ({ onClick }: ButtonProps) => {
       className="cursor-pointer text-sm md:text-base font-rubik text-soft-red font-medium flex items-center gap-1
       hover:opacity-40"
     >
-      <Image src={repIcon} alt="reply" />
+      <Image src={repIcon} alt="delete button" />
       <span>Delete</span>
     </button>
   );
