@@ -11,11 +11,11 @@ const Picture = ({ mb, dt }: Images) => {
       <source srcSet={dt} type="image/webp" media="(min-width: 768px)" />
       {mb && (
         <Images
-          className="h-auto md:w-10 lg:w-16"
+          className="h-auto "
           src={mb}
           alt="Profile Picture"
-          width={30}
-          height={30}
+          width={35}
+          height={35}
           quality={100}
         />
       )}

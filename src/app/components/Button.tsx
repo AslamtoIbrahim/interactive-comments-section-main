@@ -5,6 +5,7 @@ interface ButtonProps {
   className?: string;
   onClick?: () => void;
   text?: string;
+  
 };
 const Button = ({ className, onClick, text = "Send" }: ButtonProps) => {
   return (
